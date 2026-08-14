@@ -1,0 +1,2805 @@
+imports:
+    - mode: add
+      module: loader.dll
+      entries:
+        - ordinal: 1
+
+exports:
+    clear: true
+    entries:
+      - op: add
+        name: LauncherMain
+        rva_sig:
+            section: .text
+            sig: 48 89 5C 24 ?? 48 89 7C 24 ?? 55 41 54 41 55 41 56 41 57 48 8D AC 24 ?? ?? ?? ?? 48 81 EC
+
+      - op: add
+        name: AmdPowerXpressRequestHighPerformance
+        rva: 0x171BB5C
+
+      - op: add
+        name: CreateGlobalMemAlloc
+        rva_sig:
+          section: .text
+          sig: 40 53 48 83 EC ?? BB ?? ?? ?? ?? 33 C0
+
+      - op: add
+        name: g_pMemAllocSingleton
+        rva: 0xD40B538
+
+      - op: add
+        name: g_ThreadMainThreadID
+        rva: 0x241E443C
+
+      - op: add
+        name: g_ThreadServerFrameThreadID
+        rva: 0x171BC84
+
+      - op: add
+        name: g_pCmdLine
+        rva: 0x1F07600
+
+patches:
+
+    #
+    # Set the sample rate and avg bitrate to 16khz
+    # 
+    - type: data
+      section: .data
+      offset: 0x8B0C
+      bytes: [0x80, 0x3E, 0x00, 0x00, 0x00, 0x7D, 0x00, 0x00] 
+
+    - type: data
+      section: .rdata
+      offset: 0x9CA26
+      string: "Only %i string tables allowed, can't create '%s'\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xA8BE7
+      string: "File '%s' size %zd is too large for buffer of size %zd.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xBD01A
+      string: "PERSISTENT DATADEF: Out of room allocating '%s'. %llu/%llu strings already allocated, %llu/%llu bytes already used.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xBD0BE
+      string: "Cannot define new struct '%s', already at limit of %llu structs.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xC7930
+      string: "%8zd/%8zd/%8zd kiB unusable/unfree/total GPU Streaming Texture memory\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xD5276
+      string: "%s failed for size %zu, type %u."
+
+    - type: data
+      section: .rdata
+      offset: 0x1A9396
+      string: "GetGamemodeVar: Not connected to a server"
+
+    - type: data
+      section: .rdata
+      offset: 0x1DA4DE
+      string: "Classname '%s' is too long (%zu of %zu chars) for this entry in '%s': %s\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x25188
+      string: "An unspecified error has occurred."
+
+    - type: data
+      section: .rdata
+      offset: 0x479A8
+      string: "Negative response in cache while server connect"
+
+    - type: data
+      section: .rdata
+      offset: 0x4BAF0
+      string: "SOCKS5 server authenticated user %s with GSS-API."
+
+    #- type:
+    #  section: .rdata
+    #  offset:
+    #  string: 
+
+    - type: data
+      section: .rdata
+      offset: 0x1E3268
+      string: "FIELD_INTERVAL\0FIELD_MODELINDEX"
+
+    - type: data
+      section: .rdata
+      offset: 0x84600
+      bytes: [0x77, 0x92, 0x47, 0x41, 0x01, 0x00, 0x00, 0x00]
+
+    - type: data
+      section: .rdata
+      offset: 0xA94B8
+      string: "language"
+
+    
+
+
+    #- type: code
+    #  segment: .text
+    #  mode: replace
+
+    #  sig: F2 0F 10 0D ?? ?? ?? ?? F3 0F 10 15 ?? ?? ?? ?? 0F 5A C0 F2 0F 5D C8
+    #  patch: |
+    #    movss xmm2, dword ptr [1415BB7F4h]
+    #    divss xmm2, xmm0
+    #    jmp 14029729Ah
+
+
+    # This patch adds support for loading the 'LUMP_PAKFILE' lump as a discrete file.
+    # The function originally loaded the BSP, and stored the header in a local variable.
+    # This means that we need to store the BSP header in the lump too, if we want to load
+    # the packfile lump separately. To avoid this, we hook this function in SDK code,
+    # and load the BSP header into the static 's_MapHeader' memory. The patch below makes
+    # the function read the static fields instead, and uses the descritprs in the header to
+    # read out the lump path passed in. A separate tool sets the 'fileofs' field to 0, so the
+    # packfile lump can be loaded without any additional patching.
+
+    #s_MapHeader.ident
+    #original code
+    #s_MapHeader.version
+    #original code
+    #original code
+    #original code
+    #s_MapHeader.lumps[LUMP_PAKFILE].filelen
+    #original code
+    #s_MapHeader.lumps[LUMP_PAKFILE].fileofs
+    #Move the operation done at 0x382181 (stored into RCX) into RDX; no need to index into it again.
+    #Due to the simplification of the operation above, 2 bytes had to be nopped.
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 81 BD ?? ?? ?? ?? ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? 8B 85 ?? ?? ?? ?? 83 C0 ?? 83 F8 ?? 0F 87 ?? ?? ?? ?? 83 BD ?? ?? ?? ?? ?? 0F 8E
+
+      #s_MapHeader.ident
+      patch: |
+        cmp dword ptr [1666EC6C0h], 50534272h
+        jnz 140383335h
+        mov eax, dword ptr [rip+2636995Ch]
+        add eax, 0FFFFFFD4h
+        cmp eax, 3
+        ja 140383335h
+        cmp dword ptr [1666EC954h], 10h
+        jle 140383335h
+        movsxd rcx, dword ptr [1666EC950h]
+        mov rdx, rcx
+        nop
+        nop
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4C 63 85 40 07 00 00
+
+      #s_MapHeader.lumps[LUMP_PAKFILE].fileofs
+      #s_MapHeader.lumps[LUMP_PAKFILE].filelen
+      patch: |
+        movsxd r8, dword ptr [1666EC950h]
+        movsxd rdx, dword ptr [1666EC954h]
+
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 81 BD ?? ?? ?? ?? ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? 8B 85 ?? ?? ?? ?? 83 C0 ?? 83 F8 ?? 0F 87 ?? ?? ?? ?? 83 BD ?? ?? ?? ?? ?? 49 8B D6
+
+      #s_MapHeader.ident
+      #original code
+      #s_MapHeader.version
+      #original code
+      #original code
+      #original code
+      #s_MapHeader.lumps[LUMP_PAKFILE].filelen
+      #original code
+      #original code
+      #original code
+      #original code
+      #original code
+      #s_MapHeader.lumps[LUMP_PAKFILE].fileofs
+      patch: |
+        cmp dword ptr [1666EC6C0h], 50534272h
+        jnz 14038330Dh
+        mov eax, dword ptr [rip+26369633h]
+        add eax, 0FFFFFFD4h
+        cmp eax, 3
+        ja 14038330Dh
+        cmp dword ptr [1666EC954h], 10h
+        mov rdx, r14
+        mov rcx, rsi
+        jle 140383313h
+        mov rax, qword ptr [rsi]
+        xor r9d, r9d
+        movsxd r8, dword ptr [1666EC950h]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4C 63 85 50 0F 00 00 48 63 95 54 0F 00 00
+
+      #s_MapHeader.lumps[LUMP_PAKFILE].fileofs
+      #s_MapHeader.lumps[LUMP_PAKFILE].filelen
+      patch: |
+        movsxd r8, dword ptr [1666EC950h]
+        movsxd rdx, dword ptr [1666EC954h]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 41 B8 ?? ?? ?? ?? C6 05 ?? ?? ?? ?? ?? 48 8D 15 ?? ?? ?? ?? 48 C7 44 24
+
+      # This patch increases the 'CModelRenderSystem::m_BoneToWorldOriented' memory buffer size to 2MiB. Previously,
+      # this was 1MiB, but would occasionally overflow when there are about 80 players rendering on the client's
+      # screen. This satisfies the required memory size to render all 120 player models (active players on server).
+      patch: |
+        mov r8d, 200000h
+
+    # This patch assigns the model and anim cache pointers to NULL instead of 0xDEADFEEDDEADFEED,
+    # if the asset failed to load. The 0xDEADFEEDDEADFEED (DC_INVALID_HANDLE) assignment was most
+    # likely done to catch errors in the asset loading system, since the pointer test won't fail
+    # while the pointer is invalid, this cause a hard crash. We however don't want this as this
+    # would cause issues loading BSP's with missing assets (the SDK handles the errors properly
+    # and also logs what was failed to load).
+
+    - type: code
+      segment: .text
+      mode: replace
+    
+      sig: 48 B8 ED FE AD DE ED FE AD DE 49 89 07
+      
+      # NULL RAX instead of mov'ing '0xDEADFEEDDEADFEED' to cache ptr in 'Pak_UpdateModelAsset()'
+      patch: |
+        xor rax, rax
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 B8 ED FE AD DE ED FE AD DE 48 89 43 08
+
+      # NULL RAX instead of mov'ing '0xDEADFEEDDEADFEED' to cache ptr in 'Pak_UpdateAnimRigAsset()'
+      patch: |
+        xor rax, rax
+
+    # GetStudioHardwareForCombinedLODRange
+    # Expand null check on the modelCache pointer to include checking for 0xDEADFEEDDEADFEED error value
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 48 8B 40 ?? FF C3
+
+      patch: |
+        mov r10, 0DEADFEEDDEADFEEDh
+        cmp rax, r10
+        jz 1401E7B0Eh
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 74 ?? 40 38 35 ?? ?? ?? ?? 75 ?? 83 FB
+
+      # If we don't have an STBSP file, the field s_textureStreamMgr.hasResidentPages will be false. But if the texture
+      # stream manager is initialized and the stream mode is set to default, the code will force the stream mode to disabled.
+      # However, our engine has a working implementation of the GPU driven texture streaming system, and the correct thing
+      # to do here is to not force anything, since our SDK will enable the GPU driven texture streaming system if an STBSP
+      # file wasn't provided for the level. We turn the conditional jump to an unconditional jump here to skip this code.
+      patch: |
+        jmp 1403E0F74h
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 05 ?? ?? ?? ?? F3 0F 10 25
+
+      # -- TextureStreamMgr_FillItems
+      patch: |
+        mov rax, [1635A7918h]
+    
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4C 8D 35 ?? ?? ?? ?? 49 8B F8 48 8B DA 48 8B F1 BD
+
+      # -- Pak_UpdateTextureAsset
+      # Previously, this LEA'd the address of 's_textureStreamMgr', and used the instructions below to offset into the
+      # 'streamingTextures' member. But now we dereference and load the address of our new array directly into r14.
+      patch: |
+        mov r14, [1635A7918h]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 49 8B 94 C6 ?? ?? ?? ?? 4D 89 94 C6
+
+      # The following instruction patches remove the immediate '0x388' which is the actual offset to 'streamingTextures'
+      # from the start of the struct 'TextureStreamMgr_s', since we store the address of our new array directly into r14
+      # from the lea -> mov patch above, so we don't need to add that on top of the address.
+      patch: |
+        mov rdx, qword ptr [r14+rax*8]
+        mov qword ptr [r14+rax*8], r10
+        movzx eax, word ptr [r8]
+        mov [rdx+38h], ax
+        movzx eax, word ptr [r8]
+        mov qword ptr [r14+rax*8], rdx
+        jmp 1403ED181h
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        dec eax
+        mov [r14+rax*8], r10
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 49 89 B4 C6
+
+      patch: |
+        mov [r14+rax*8], rsi
+
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4C 8D 25 ?? ?? ?? ?? 66 90 8B C5
+
+      # -- TextureStreamMgr_GetStreamOverlay
+      # Previously, this LEA'd the base address of our module, and used the instructions below to offset into the
+      # 'streamingTextures' member using an immediate. But now we load the address of our new array directly into r12.
+      
+      #The patch (mov r9, qword ptr [r12+rax*8]) removes the immediate '0x235A7918' which is the actual offset to 'streamingTextures'
+      # from the base address of our module. Since we store the address of our new array directly into r12 from
+      #the lea -> mov patch above, so we don't need to add that on top of the address.
+      
+      patch: |
+        mov r12, qword ptr [1635A7918h]
+        xchg ax, ax
+        mov eax, ebp
+        mov r9, qword ptr [r12+rax*8]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4C 8D 3D ?? ?? ?? ?? 49 3B C9
+
+      # -- TextureStreamMgr_AddOrDrop
+      # Swap LEA module base with MOV 's_textureStreamMgr.streamingTextures'.
+      patch: |
+        mov r15, qword ptr [1635A7918h]
+    
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4C 8D 3D ?? ?? ?? ?? 49 8B F6
+
+      # -- TextureStreamMgr_AddOrDrop
+      # Swap LEA module base with MOV 's_textureStreamMgr.streamingTextures'.
+      patch: |
+        mov r15, qword ptr [1635A7918h]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4D 8B 84 C7 ?? ?? ?? ?? 41 80 78
+
+      # -- TextureStreamMgr_AddOrDrop
+      # Remove immediate '0x235A7918'
+      patch: |
+        mov r8, qword ptr [r15+rax*8]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 49 8B 8C C7 ?? ?? ?? ?? 49 89 08 0F B6 41 ?? 2A 42 ?? 41 88 40
+
+      # -- TextureStreamMgr_AddOrDrop
+      # Remove immediate '0x235A7918'
+      patch: |
+        mov rcx, qword ptr [r15+rax*8]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 49 8B 8C C7 ?? ?? ?? ?? 49 89 08 0F B6 41 ?? 2A 42 ?? FE C8
+
+      # -- TextureStreamMgr_AddOrDrop
+      # Remove immediate '0x235A7918'
+      patch: |
+        mov rcx, qword ptr [r15+rax*8]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 49 8B 8C C7 ?? ?? ?? ?? 49 89 08 0F B6 41 ?? 2A 42 ?? FE C8
+
+      # -- TextureStreamMgr_AddOrDrop
+      # Remove immediate '0x235A7918'
+      patch: |
+        mov rcx, qword ptr [r15+rax*8]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4C 8D 3D ?? ?? ?? ?? 90 48 3B CD
+
+      # -- TextureStreamMgr_AddOrDrop
+      # Swap LEA module base with MOV 's_textureStreamMgr.streamingTextures'.
+      patch: |
+        mov r15, qword ptr [1635A7918h]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4D 8B 9C C7 ?? ?? ?? ?? 41 0F B6 43
+
+      # -- TextureStreamMgr_AddOrDrop
+      # Remove immediate '0x235A7918'
+      patch: |
+        mov r11, qword ptr [r15+rax*8]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4C 8D 0D ?? ?? ?? ?? 48 C1 E0 ?? 45 33 C0 33 D2 42 8B 84 38
+
+      # Dereference old array to get pointer to new array for the call to TextureStreamMgr_FillItems
+      patch: |
+        mov r9, qword ptr [1635A7918h]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 8B 35 ?? ?? ?? ?? 48 89 44 24
+
+      # Dereference old array to get pointer to new array for the call to TextureStreamMgr_FillItems
+      patch: |
+        mov rcx, qword ptr [1635A7918h]
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+
+      sig: 42 8B 84 38 ?? ?? ?? ?? 89 44 24 ?? 48 89 74 24
+
+      # r15 originally contained the module base, but this now contains the address of the new array,
+      # the job_JT_RegisteredTypes array took advantage of the module base being in r15 and used that
+      # to obtain JobType_s::field_2c at given array index. Since there wasn't enough space left inside
+      # the current block, the code cave is used to recreate this logic. 
+      # The module base is stored in r13 which will be clobbered directly after
+      # the call to this function (TextureStreamMgr_AddOrDrop).
+      patch: |
+        lea r13, [140000000h]
+        mov eax, dword ptr [rax+r13*1+0x27EE1E2C]
+
+
+# The following patches are done to increase the buffer sizes of g_constBufferCollection in order
+# to allow more const buffers to be loaded at runtime (the amount of assets we've ported so far
+# made us reach the current limit of 3072).
+# g_constBufferCollection.insertItems (inline array) was used directly at the following offsets,
+# in the SDK we write the pointer to our new array directly at the address of the old array, and
+# switch the LEA instruction out with MOV to make code dereference it and use our new array!
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4C 8D 25 ?? ?? ?? ?? 4C 89 70 ?? 4C 8D 35 ?? ?? ?? ?? 4C 89 78 ?? 4C 8D 3D ?? ?? ?? ?? 0F 1F 40
+
+      patch: |
+        mov r12, qword ptr [1671856B0h]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 05 ?? ?? ?? ?? 49 C1 E2 ?? 4C 03 D0 41 83 42
+
+      patch: |
+        mov rax, qword ptr [1671856B0h]
+
+# The access to the same array is slightly more obscure here, because g_constBufferCollection is
+# used as base address, since the mutex lock is nearby (minor optimization) and the code uses the
+# offset of the old static array (0x4070) as immediate to index right into it. In at the following
+# patches, we jump to a code cave and instead use the pointer that is set at Gfx_InitShared() which
+# allows for reassigning the buffer location directly from the SDK without patching anything again!
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+
+      sig: 48 39 B4 C5
+
+      patch: |
+        mov r10, 167181688h
+        mov r11, qword ptr [r10]
+        cmp qword ptr [r11+rax*8], rsi
+
+# Same process is repeated here for the other use cases (note that register usage is different due to contextual reasons):
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+
+      sig: 48 39 BC C5
+
+      patch: |
+        mov r10, 167181688h
+        mov rcx, qword ptr [r10]
+        cmp qword ptr [rcx+rax*8], rdi
+
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+
+      sig: 48 8B 94 C5 ?? ?? ?? ?? 69 C2 ?? ?? ?? ?? 48 C1 EA ?? C1 C0 ?? 69 C8 ?? ?? ?? ?? 69 C2 ?? ?? ?? ?? C1 C1 ?? C1 C0 ?? 81 C1 ?? ?? ?? ?? 69 C0 ?? ?? ?? ?? 44 8D 04 89 44 33 C0 41 C1 C0 ?? 41 81 C0 ?? ?? ?? ?? 43 8D 0C 80 83 F1 ?? 8B C1 C1 E8 ?? 33 C1 69 C8 ?? ?? ?? ?? 8B C1 C1 E8 ?? 33 C1 69 C8 ?? ?? ?? ?? 8B D1 C1 EA ?? 33 D1 45 33 C0 66 66 0F 1F 84 00
+
+      patch: |
+        mov r8, 167181688h
+        mov rdx, qword ptr [r8]
+        mov rdx, qword ptr [rdx+rax*8]
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+
+      sig: 48 8B 94 C5 70 40 00 00 69 C2 51 2D 9E CC 48 C1 EA 20 C1 C0 0F 69 C8 93 35 87 1B 69 C2 51 2D 9E CC C1 C1 0D C1 C0 0F 81 C1 14 AF DD FA 69 C0 93 35 87 1B 44 8D 04 89 44 33 C0 41 C1 C0 0D 41 81 C0 14 AF DD FA 43 8D 0C 80 83 F1 08 8B C1 C1 E8 10 33 C1 69 C8 6B CA EB 85 8B C1 C1 E8 0D 33 C1 69 C8 35 AE B2 C2 8B D1 C1 EA 10 33 D1 45 33 C0 23 15 42 1B DA 26
+
+      patch: |
+        mov r8, 167181688h
+        mov rdx, qword ptr [r8]
+        mov rdx, qword ptr [rdx+rax*8]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4C 8D 1D ?? ?? ?? ?? 69 C6
+
+      # The ones here are similar to the usages above, however we are lucky because the base is stored at
+      # R11 and R11 was only used to access g_constBufferCollection.insertItems through immediate offset.
+      # So we just change it to MOV ptr into R11 which allows us to index directly into our new array:
+      patch: |
+        mov r11, qword ptr [167181688h]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 49 39 84 CB
+
+      # removed immediate '0x4070', because the new buffer is now in R11.
+      patch: |
+        cmp qword ptr [r11+rcx*8], rax
+
+
+#   Code Defects
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 80 4F ?? ?? 48 8B 05
+
+      # This fixes an engine bug where '-forceborder' did not force the border over the application window.
+      patch: |
+        and byte ptr [rdi+14h], 0FDh
+
+
+    #
+    # line 160, data patch not done yet
+    # line 161, data patch not done yet
+    #
+
+    # TODO: Allow inserting and shifting the old instructions forward
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 05 6B 34 34 01
+
+      # This fixes a bug where the help string of a ConVar is set as the conVar name, which prevents you from
+      # setting it in the console due to the precense of space characters.
+      patch: |
+        lea rax, [141516578h]
+        mov qword ptr [142324538h], rax
+        lea rax, [141459F20h]
+        mov qword ptr [142324540h], rax
+        lea rax, [141324120h]
+        mov qword ptr [142324548h], rax
+        mov rax, [14D40E7C0h]
+        mov qword ptr [142324528h], rax
+        mov byte ptr [142324530h], 0
+        mov qword ptr [142324550h], 0
+        mov dword ptr [142324558h], 2002h
+        mov qword ptr [14D40E7C0h], rbx
+        jz no_accessor
+        mov rax, qword ptr [142324520h]
+        mov rcx, rbx
+        call qword ptr [rax+68h]
+        no_accessor:
+        lea rcx, [14124B700h]
+        add rsp, 20h
+        pop rbx
+        jmp 14117FCD8h
+
+
+    # TODO: Allow inserting and shifting the old instructions forward
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 05 6B DA 2F 01
+
+      # This fixes a bug where the help string of a ConVar is set as the conVar name, which prevents you from
+      # setting it in the console due to the precense of space characters.
+      patch: |
+        lea rax, [141516578h]
+        mov qword ptr [14238DDA8h], rax
+        lea rax, [141459F20h]
+        mov qword ptr [14238DDB0h], rax
+        lea rax, [141324120h]
+        mov qword ptr [14238DDB8h], rax
+        mov rax, qword ptr [14D40E7C0h]
+        mov qword ptr [14238DD98h], rax
+        mov byte ptr [14238DDA0h], 0
+        mov qword ptr [14238DDC0h], 0
+        mov dword ptr [14238DDC8h], 2002h
+        mov qword ptr [14D40E7C0h], rbx
+        jz no_accessor
+        mov rax, qword ptr [14238DD90h]
+        mov rcx, rbx
+        call qword ptr [rax+68h]
+        no_accessor:
+        lea rcx, [141272350h]
+        add rsp, 20h
+        pop rbx
+        jmp 14117FCD8h
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 0F 28 C1 48 8D 44 24
+
+      # In 'CInput::JoyStickApplyMovement' an extraneous 'fmin' clamp is performed on the frame time. BinDiff revealed that this was no longer performed on
+      # the 'Season 9.1 Genesis' executable. Further testing revealed that patching out just this clamp fixes the controller view stick problems when usercmd's
+      # get dropped in CL_Move.
+
+      # Nop 'minss   xmm0, xmm6' (extraneous clamp).
+
+      patch: |
+        movaps xmm0, xmm6
+        lea rax, [rsp+4Ch]
+        mov [rsp+30h], rax
+        nop
+        nop
+        nop
+        nop
+
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 0F 28 F0 48 8D 94 24
+
+      # Nop 'movaps  xmm6, xmm0' (extraneous move operation).
+      patch: |
+        nop
+        nop
+        nop
+
+
+# This fixes a bug where the control member 'CUtlBuffer::m_Get' is out of sync with the text buffer in 'CUtlBuffer::ParseToken'.
+# When we iterate over each character in the token buffer, we perform an equality test between the read len and buf len to prevent
+# a buffer overflow. Before this test happens, the read len always gets incremented by 1.
+# When the test fails, the code continues to where it checks if the control character is a break character (delimiter), if so,
+# the code breaks out of the loop, decrements the 'm_Get' member variable by 1, null-terminates the token buffer and returns the
+# read len. The issue is that read len has been incremented by 1 during the equality test, but the m_Get member variable by -1,
+# causing a desync. The next time 'ParseToken' is getting called, the control character will be off by one as 'm_Get' is off by one.
+# The fix is to just nop the decrement operation in assembled code (see commit '4969a84' for the source code fix).
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 43 ?? 48 3B 43 ?? 7E ?? 41 80 C8
+
+      # Nop 'movaps  xmm6, xmm0' (extraneous move operation).
+      patch: |
+        nop
+
+
+# If we have a partial install and are still downloading optional streaming files, the game would unload the current level VPK
+# and reload all RPak files once we have fully downloaded all the optional files and disconnected from the server. However, on
+# listen server builds, the unloading of the VPK and RPak's happen too early; it will unload the files while the server is still
+# active. We should check on CHostState::m_bActiveGame and only unload the current level VPK and RPak's if this is false. The
+# RPak reloading logic has been fixed in `Mod_RunPakJobFrame`, however the VPK code is inline and the check has to be embedded
+# in the assembly here.
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 83 3D ?? ?? ?? ?? ?? 7D ?? E8 ?? ?? ?? ?? E8 ?? ?? ?? ?? 83 3D
+
+      patch: |
+        cmp byte ptr [141736384h], 0x0
+        jne 1402975C5h
+
+
+# ------------------------------------------------------------------------------------------------
+# This fixes an engine bug causing alphasort (translucent world) textures to not stream when using
+# the GPU driven feedback approach. Since we need to run and apply an update during R_DrawAlphaSort(),
+# we need to create a separate set of DX buffers and handles to allow this to work without interfering
+# with other render passes. For this, the static arrays had to be increased with the following set of
+# patches bellow.
+# The immediate to access 0x1671CAA80 has been increased with 4 bytes to create enough space
+# for 3rd elem in int array at 0x1671CAA78, 0x1671CAA80 is now at 0x1671CAA84.
+
+# *** sub_1403F4F80 ***
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 43 8B 84 BD
+
+      patch: |
+        mov eax, dword ptr [r13+r15*4+271CAA84h]
+    
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 43 89 84 BD
+
+      patch: |
+        mov dword ptr [r13+r15*4+271CAA84h], eax
+
+# all other instructions from here have been shifted to accomodate the new
+# instruction at 0x3F40A6.
+# ------------------------
+# Since the increase of the i32 arrays above with 1 element each (8 bytes total). We need to
+# shift this bool at 0x1671CAA88 with 8 bytes downwards as its originalspace has now been used.
+# This is the only place this bool is ever accessed from. We have 24 bytes padding before we
+# reach our next static element so enough space.
+
+
+# *** sub_1403F4AA0 ***
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: false
+      
+      byte_restore_pos: trailing
+
+      sig: C7 05 ?? ?? ?? ?? ?? ?? ?? ?? C7 05 ?? ?? ?? ?? ?? ?? ?? ?? 48 8B 5D
+
+      patch: |
+        mov dword ptr [1635A7A30h], 3h
+        mov dword ptr [1635A7A34h], 3h
+        mov dword ptr [1635A7A38h], 3h
+        mov rbx, qword ptr [rbp-28h]
+        lea rax, [rbp-38h]
+        mov byte ptr [1671CAA90h], 1
+        jmp 1403F4CB4h
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 05 ?? ?? ?? ?? ?? 48 3B D8 74
+
+      patch: |
+        mov byte ptr [1671CAA90h], 1
+
+#
+# TextureStreamMgr_CommitComputeShaderResult
+#
+#
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+      
+      byte_restore_pos: trailing
+
+      sig: 41 8B B4 9D
+
+      patch: |
+        cmp ebx, 5h
+        jnz exit_patch
+        mov esi, dword ptr [1635A7A4Ch]
+        lea ebx, [rsi+3]
+        inc esi
+        mov dword ptr [1635A7A4Ch], esi
+        exit_patch:
+        mov esi, dword ptr [r13+rbx*4+235a7a18h]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 45 89 B4 9D
+
+      patch: |
+        mov dword ptr [r13+rbx*4+235a7a18h], r14d
+
+
+#
+#  TextureStreamMgr_CommitComputeShaderResult
+#
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 43 8B 84 BD
+
+      patch: |
+        mov eax, dword ptr [r13+r15*4+235a7a30h]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 43 89 84 BD
+
+      patch: |
+        mov dword ptr [r13+r15*4+235a7a30h], eax
+
+
+# *** sub_1403F4A30 ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C7 05 ?? ?? ?? ?? ?? ?? ?? ?? C7 05 ?? ?? ?? ?? ?? ?? ?? ?? 48 83 C4 ?? C3 CC CC CC 48 89 5C 24
+
+      patch: |
+        mov dword ptr [1671CAA84h], 3h
+        mov dword ptr [1671CAA88h], 3h
+
+# Jump to code cave to set the 3rd (new) element, because there was not enough space left in
+# the current function frame.
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+
+      # stolen bytes will include the return anyway so no point
+      jump_back: false
+      
+      byte_restore_pos: trailing
+
+      sig: 48 83 C4 ?? C3 CC CC CC 48 89 5C 24 ?? 48 89 74 24 ?? 48 89 7C 24 ?? 55 41 54
+
+      patch: |
+        mov dword ptr [1671CAA8Ch], 3h
+
+
+# Since we increased dword_1671CAA48 and qword_1671CAA10 from 6 elements to 9 elements,
+# we need to setup the last 3 elements here as well, so this immediate has been increased
+# from 2 to 3 to take these into account.
+# Comment wrong
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 C7 85 ?? ?? ?? ?? ?? ?? ?? ?? 41 BE
+
+      patch: |
+        mov qword ptr [rbp+7FF90h], 6h
+
+# 1671CAA10 has been moved to address 1635A7940, because there was not enough room left in our
+# old location to increase it from 6 elements to 9 to account for the alphasort render step.
+# 1635A7940 is inside our old static texture streaming handle array that has been increased in
+# commit ... -- since this large array is no longer used, we can use it for this change.
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 1D ?? ?? ?? ?? 48 C7 85
+
+      patch: |
+        lea rbx, [1635A7940h]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 49 8B 94 ED
+
+      patch: |
+        mov rdx, qword ptr [r13+rbp*8+235A7940h]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 49 8B 94 FD ?? ?? ?? ?? FF 50
+
+      patch: |
+        mov rdx, qword ptr [r13+rdi*8+235A7940h]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 49 8B 94 FD ?? ?? ?? ?? 48 8B 01
+
+      patch: |
+        mov rdx, qword ptr [r13+rdi*8+235A7940h]
+
+# 1671CAA48 has been moved to address 1635A7988, same reason as above, this array contains
+# handles for the dx buffers.
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 3D ?? ?? ?? ?? 48 8D 1D ?? ?? ?? ?? 48 C7 85
+
+      patch: |
+        lea rdi, [1635A79D0h]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 49 8D B5 ?? ?? ?? ?? 3B C3
+
+      patch: |
+        lea rsi, [r13+235a79d0h]
+
+# ------------------------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------------------------
+# This fixes a regression that was caused after a refactor on HUD data structures; the base sizes
+# are now written in a child structure, however, the function `Hud_SetScale` still accessed the old
+# root structure members. This regression broke the HUD overlays for weapons such as the smart pistol,
+# SRAM rocket launcher titan homing rockets, etc.. as well as the abstracted script function binding.
+# The `Hud_SetScaleX()` and `Hud_SetScaleY()` methods actually do access the correct child data members
+# confirming this function to be broken. The patch is simple; the child data structure is accessed
+# below our incorrect instructions for obtaining the base size, we just move the instruction above the
+# getters for the base size, and use that register instead with the updated offsets to obtain the right values.
+
+# *** Hud_SetScale ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 66 41 0F 6E 86 ?? ?? ?? ?? 66 41 0F 6E 8E
+
+      patch: |
+        mov rcx, qword ptr [r14+28h]
+        movd xmm0, dword ptr [rcx+144h]
+        movd xmm1, dword ptr [rcx+148h]
+
+# ------------------------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------------------------
+# This fixes a crash if we run out of tracing slots, the array is of a fixed size and can run
+# out of room in which the slot -1 is returned and the structure pointer is set to NULL. However,
+# the structure pointer is still dereferenced leading to the crash. For the patch, the nulling of
+# this register has been removed and the new space is used to transform the short jmp instruction
+# to a long jmp to return gadget (which for all these functions either sets the slot result (-1)
+# to the provided pointer, or into EAX).
+
+# *** sub_1408AD8D0 ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 33 D2 41 8B DA 8B CA
+
+      patch: |
+        jmp 1408ADA0Eh
+
+# *** sub_1405F2320 ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 33 C0 8B C8 EB 3D 8B C3 25 FF 1F 00 00 48 8D 0C C0 48 C1 E1 06 48 8D 05 AA 65 1F 24
+
+      patch: |
+        jmp 1405F2766h
+
+# *** sub_140608EE0 ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B CF EB ?? 8B C6
+
+      patch: |
+        jmp 140609370h
+
+# *** sub_14085D900 ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 75 ?? 33 C9 EB ?? 8B C6
+
+      patch: |
+        je 14085E22Ch
+
+# *** sub_1408AD720 ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 33 C9 41 8B DA
+
+      patch: |
+        jmp 1408AD8AEh
+
+# *** sub_140951D30 ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 33 D2 41 8B D9
+
+      patch: |
+        jmp 140951E8Bh
+
+# *** sub_140954C60 ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 49 8B CE EB ?? 8B C2 25 ?? ?? ?? ?? 48 8D 0C C0 48 C1 E1 ?? 49 03 C8
+
+      patch: |
+        jmp 140955EC9h
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 49 8B CE EB ?? 8B C2 25 ?? ?? ?? ?? 48 8D 0C C0 48 C1 E1 ?? 48 8D 05
+
+      patch: |
+        jmp 140955FD3h
+
+# *** sub_140A46ED0 ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 49 8B CC EB ?? 8B C6
+
+      patch: |
+        jmp 140A4722Eh
+
+
+# sub_1401FEC00
+# This CEngineClient function checks if origin should be enabled based on if -noorigin
+# It should only check for the paramater once and then the is cached 
+# However we never set the var for saying that the cached value has been set
+# This fixes it here and in all inlined calls
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 05 ?? ?? ?? ?? ?? 38 05 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? 48 8D 15 ?? ?? ?? ?? 48 0F 44 C8 45 33 C0 48 8B 01 FF 50 ?? 48 85 C0 0F 94 C0 84 C0
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 05 ?? ?? ?? ?? ?? 38 05 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? 48 8D 15 ?? ?? ?? ?? 48 0F 44 C8 45 33 C0 48 8B 01 FF 50 ?? 48 85 C0 0F 94 C2
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 05 ?? ?? ?? ?? ?? 38 05 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? 48 8D 15 ?? ?? ?? ?? 48 0F 44 C8 45 33 C0 48 8B 01 FF 50 ?? 48 85 C0 0F 94 C0 88 05 ?? ?? ?? ?? EB ?? 0F B6 05 ?? ?? ?? ?? 84 C0 74 ?? 48 83 C4
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 05 B2 AD 4A 29 00
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 05 02 AD 4A 29 00
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 05 22 AC 4A 29 00
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 05 A2 AA 4A 29 00
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 05 52 AE 4A 29 00
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 88 1D 7E AC 4A 29
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 88 1D ?? ?? ?? ?? 48 0F 44 CB 45 33 C0 48 8B 01 FF 50 ?? 48 85 C0 0F 94 C0 88 05
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+#
+# DebugOverlay_AddTransformedBoxOverlay
+# Fix incorrect partial null pointer check
+#
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 74 1D C7 40 04 FF FF FF FF C7 40 18 FF FF FF FF 33 C0 41 89 41 08 49 89 41 10 41 89 01 EB 03 4C 8B C8
+
+      patch: |
+        jnz back
+        lea rcx, [160676D40h]
+        call 1412969B0h
+        jmp 140207AC7h
+        back:
+        mov dword ptr [rax+4], 0FFFFFFFFh
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4C 8B 05 A1 43 17 0B
+
+      patch: |
+        mov r8, qword ptr [14B37BE50h]
+        mov [r9+10h], r8
+        mov [14B37BE50h], r9
+        lea rcx, [160676D40h]
+
+
+#
+# DebugOverlay_AddLineOverlay
+# Fix incorrect partial null pointer check
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 45 33 C9 8B 07
+
+      patch: |
+        jmp 140207CB4h
+
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4C 8B 05 A7 41 17 0B
+
+      patch: |
+        mov r8, qword ptr [14B37BE50h]
+        mov [r9+10h], r8
+        mov [14B37BE50h], r9
+        lea rcx, [160676D40h]
+
+
+#
+# AddCustomMeshOverlay
+# Jump to function exit on overlay base allocation failure 
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 74 ?? C7 40 ?? ?? ?? ?? ?? C7 40 ?? ?? ?? ?? ?? 44 89 48
+
+      patch: |
+        jz 140207EEDh
+        nop
+        mov dword ptr [rax+4], 0FFFFFFFFh
+        mov dword ptr [rax+18h], 0FFFFFFFFh
+        mov [rax+8], r9d
+        mov [rax+10h], r9
+        mov dword ptr [rax], 3
+        lea eax, [rdi+rdi]
+
+#
+# AddCustomMeshOverlay
+# Use the 6th argument for the alpha channel
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 41 C7 80 ?? ?? ?? ?? ?? ?? ?? ?? E8 ?? ?? ?? ?? 80 7C 24
+
+      patch: |
+        mov eax, dword ptr [rsp+58h]
+        mov [r8+1830h], eax
+
+#
+# AddSphereOverlay
+# Jump to function exit on overlay base allocation failure
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 45 33 C9 8B 03 49 8B C9
+
+      patch: |
+        jmp 14020896Fh
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D ?? ?? ?? ?? 4D 89 41 ?? 4C 89 0D ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 48 8B 5C 24 ?? 0F 28 74 24
+
+      patch: |
+        mov [r9+10h], r8
+        mov qword ptr [14B37BE50h], r9
+        lea rcx, [160676D40h]
+
+#
+# AddSweptBoxOverlay
+# Jump to function exit on allocation failure
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 74 ?? C7 40 ?? ?? ?? ?? ?? C7 40 ?? ?? ?? ?? ?? C7 40 ?? ?? ?? ?? ?? 48 C7 40 ?? ?? ?? ?? ?? C7 00 ?? ?? ?? ?? EB ?? 45 33 C9 8B 06
+
+      patch: |
+        jz 140208AF4h
+        nop
+        mov dword ptr [rax+4], 0FFFFFFFFh
+        mov dword ptr [rax+18h], 0FFFFFFFFh
+        mov dword ptr [rax+8], 0
+        mov qword ptr [rax+10h], 0
+        mov dword ptr [rax], 6
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D 50 E2 46 20
+
+      patch: |
+        mov [r9+10h], r8
+        mov qword ptr [14B37BE50h], r9
+        lea rcx, [160676D40h]
+
+
+#
+# AddTriangleOverlay
+# Jump to function exit on allocation failure
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 74 ?? C7 40 ?? ?? ?? ?? ?? C7 40 ?? ?? ?? ?? ?? C7 40 ?? ?? ?? ?? ?? 48 C7 40 ?? ?? ?? ?? ?? C7 00 ?? ?? ?? ?? EB ?? 45 33 C9 41 8B 06
+
+      patch: |
+        jz 140208EFAh
+        nop
+        mov dword ptr [rax+4], 0FFFFFFFFh
+        mov dword ptr [rax+18h], 0FFFFFFFFh
+        mov dword ptr [rax+8], 0
+        mov qword ptr [rax+10h], 0
+        mov dword ptr [rax], 5
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D ?? ?? ?? ?? 4D 89 41 ?? 4C 89 0D ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 48 8B 5C 24 ?? 48 8B 74 24 ?? 48 8B 7C 24
+
+      patch: |
+        mov [r9+10h], r8
+        mov qword ptr [14B37BE50h], r9
+        lea rcx, [160676D40h]
+        
+
+#
+# sub_140209440
+# Jump to function exit on allocation failure
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 74 ?? C7 40 ?? ?? ?? ?? ?? C7 40 ?? ?? ?? ?? ?? 33 C0 41 89 41 ?? 49 89 41 ?? 49 89 41
+
+      patch: |
+        jz 14020958Fh
+        nop
+        mov dword ptr [rax+4], 0FFFFFFFFh
+        mov dword ptr [rax+18h], 0FFFFFFFFh
+        xor eax, eax
+        mov [r9+8], eax
+        mov [r9+10h], rax
+        mov [r9+50h], rax
+        mov dword ptr [r9], 7
+
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D B5 D7 46 20
+
+      patch: |
+        mov [r9+10h], r8
+        mov qword ptr [14B37BE50h], r9
+        lea rcx, [160676D40h]
+
+#
+# CFmtStr256
+# Fix incorrect buffer size, it is currently 255 but should be 256 to match the size of the buffer
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: BA ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 C7 C0 ?? ?? ?? ?? 48 FF C0 41 80 7C 06
+
+      patch: |
+        mov edx, 100h
+
+#
+# CFmtStr2048
+# Fix incorrect buffer size, it is currently 2047 but should be 2048 to match the size of the buffer
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: BA ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 C7 C0 ?? ?? ?? ?? 48 FF C0 80 7C 06
+
+      patch: |
+        mov edx, 800h
+
+#
+# CNetworkStringTableContainer::CreateStringTable
+# String pointer to "Only %i string tables allowed, can't create'%s'" has been moved
+# New location is now 0x141332A26
+#
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D ?? ?? ?? ?? BA ?? ?? ?? ?? E8 ?? ?? ?? ?? 33 C0 E9
+
+      patch: |
+        lea rcx, [141332A26h]
+
+
+#
+# NET_Config
+# CNetAdr::ToString should be called with bOnlyBase true we dont want the port in the convar
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 33 D2 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? 48 8B D0
+
+      patch: |
+        mov dl, 1
+
+#
+# StartPlaylist
+# If a game is running (m_bActiveGame == true) then we should use changelevel instead of map when starting a playlist
+#
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+      jump_back: true
+      byte_restore_pos: leading
+
+      sig: 48 8D 0D 8D D7 0A 01
+
+      patch: |
+        cmp byte ptr [141736384h], 0
+        jz 140279EBBh
+        lea rcx, [14132E788h]
+
+#
+# sub_14027E0C0
+# Fix early return on inlined overlay box
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 45 33 C9 0F 28 45
+
+      patch: |
+        jmp 14027E4A0h
+
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D ?? ?? ?? ?? 4D 89 41 ?? 4C 89 0D ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 4C 8D 0D
+
+      patch: |
+        mov [r9+10h], r8
+        mov qword ptr [14B37BE50h], r9
+        lea rcx, [160676D40h]
+
+
+#
+# LoadLocalSendtableFile
+# String pointer to "File '%s' size %d is too large for buffer of size %d.\n" has been moved
+# New location is now 0x14133EBE7
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D ?? ?? ?? ?? EB ?? 8B 44 24
+
+      patch: |
+        lea rcx, [14133EBE7h]
+
+#
+# box_command_completion
+# Jump to function exit on allocation failure
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 74 ?? C7 40 ?? ?? ?? ?? ?? C7 40 ?? ?? ?? ?? ?? 44 89 68
+
+      patch: |
+        jz 1402C0959h
+        nop
+        mov dword ptr [rax+4], 0FFFFFFFFh
+        mov dword ptr [rax+18h], 0FFFFFFFFh
+        mov dword ptr [rax+8], r13d
+        mov qword ptr [rax+10h], r13
+        mov dword ptr [rax], r13d
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D ?? ?? ?? ?? 4D 89 41 ?? 4C 89 0D ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 4C 8B 6C 24
+
+      patch: |
+        mov [r9+10h], r8
+        mov qword ptr [14B37BE50h], r9
+        lea rcx, [160676D40h]
+
+#
+# PdefStoreStringInStringBuffer
+# String pointer to "PERSISTENT DATADEF: Out of room allocating '%s'. %d/%d strings already allocated, %d/%d bytes already used.\n" has been moved
+# New location is 0x14135301A
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D ?? ?? ?? ?? 48 8B D6 E8 ?? ?? ?? ?? 33 C0 48 8B 5C 24
+
+      patch: |
+        lea rcx, [14135301Ah]
+
+#
+# PersistenceParseStructsAndEnums
+# String pointer to "Cannot define new struct '%s', already at limit of %d structs.\n" has been moved
+# New location is 0x1413530BE
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 32 C0 49 C7 07 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 43
+
+      patch: |
+        lea rcx, [1413530BEh]
+
+#
+# Sys_VirtualSimple_Alloc
+# String pointer to "%s failed for size %u, type %d." has been moved
+# New location is 0x14136B276
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 15 ?? ?? ?? ?? 48 8D 4C 24 ?? E8 ?? ?? ?? ?? 48 39 1D ?? ?? ?? ?? 75 ?? 48 8D 54 24 ?? 48 8B CF E8 ?? ?? ?? ?? 48 8B C3 48 8B 9C 24
+
+      patch: |
+        lea rdx, [14136B276h]
+
+#
+# RSON_LoadFromBuffer (inlined Sys_VirtualSpan_Create)
+# String pointer to "%s failed for size %u, type %d." has been moved
+# New location is 0x14136B276
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 15 E5 41 F2 00
+
+      patch: |
+        lea rdx, [14136B276h]
+
+#
+# Sys_VirtualSpan_Create
+# String pointer to "%s failed for size %u, type %d." has been moved
+# New location is 0x14136B276
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 15 C4 BA F0 00
+
+      patch: |
+        lea rdx, [14136B276h]
+
+#
+# Sys_VirtualSpan_CreateCommited
+# String pointer to "%s failed for size %u, type %d." has been moved
+# New location is 0x14136B276
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 15 C4 B4 F0 00
+
+      patch: |
+        lea rdx, [14136B276h]
+
+#
+# sub_1404663D0 (inlined Sys_VirtualSpan_Create)
+# String pointer to "%s failed for size %u, type %d." has been moved
+# New location is 0x14136B276
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 15 69 4E F0 00
+
+      patch: |
+        lea rdx, [14136B276h]
+
+#
+# Sys_VirtualSpan_Commit
+# String pointer to "%s failed for size %u, type %d." has been moved
+# New location is 0x14136B276
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 15 AE 4D F0 00
+
+      patch: |
+        lea rdx, [14136B276h]
+
+#
+# ConVar::InternalSetStringValue
+# Use "" string pointer instead of nullptr if a nullptr is passed as the string arg 
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B D6 48 8B CB 48 0F 45 FE
+
+      patch: |
+        cmovnz rdi, rsi
+        mov rdx, rdi
+        mov rcx, rbx
+        call 14046FF90h
+        test al, al
+        jnz 14047015Dh
+        mov rcx, rdi
+
+
+#
+# Client_GetGamemodeVarOrUseValue native func
+# String pointer to "__FUNCTION__: Not connected to a server" has been moved
+# New location is 0x14143F396
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D 2D 3A C1 00
+
+      patch: |
+        lea rcx, [14143F396h]
+
+
+#
+# sub_1408E1150 ( aim assist config read )
+# String pointer to "Classname '%s' is too long (%d of %d chars) for this entry in '%s': %s\n" has been moved
+# New location is 0x1414704DE
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D 74 ED B8 00
+
+      patch: |
+        lea rcx, [1414704DEh]
+
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D B4 E4 7F 00
+
+      patch: |
+        lea rcx, [1414704DEh]
+
+
+#
+# set_command_completion
+# Drop useless setClassVarServer command
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 8B 47 04 49 8B CF 83 F8 02
+
+      patch: |
+        jmp 14086BC0Eh
+
+
+
+#
+# WinMain
+# Remove calls to CheckCPU and InitExceptionFilter
+# These are done in the SDK
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: E8 ?? ?? ?? ?? E8 ?? ?? ?? ?? 44 8B CB
+
+      patch: |
+        nop
+        nop
+        nop
+        nop
+        nop
+
+
+#
+# CPackedStore::GetFileHandle
+# Deinline Filesystem ops, call FS_OpenAsyncFile instead
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 4C 24 ?? 48 89 44 24 ?? 48 03 FE
+
+      patch: |
+        add rdi, rsi
+        mov [rdi+350h], rax
+        lea rcx, [rsp+0x40]
+        lea rdx, [rax+4]
+        mov r8, rax
+        call 140439300h
+        mov r14d, eax
+        jmp 140395B57h
+
+
+#
+# CMaterialSystem::DrawStreamOverlay
+# Change store to 64bit from 32, why?
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 44 89 44 24 ?? 4C 8D 05 ?? ?? ?? ?? 48 8D 0C 02
+
+      patch: |
+        mov qword ptr [rsp+28h], r8
+
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 89 4C 24 ?? 48 8D 4C 24 ?? 4C 8D 0C 02
+
+      patch: |
+        mov qword ptr [rsp+20h], rcx
+        lea rcx, [rsp+50h]
+
+#
+# StreamDB_Init
+# Deinline file system open
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4C 89 7C 24 ?? 45 33 C9 C7 44 24
+
+      patch: |
+        mov edx, 3
+        xor r8, r8
+        call 140439300h
+        mov dword ptr [1635A7698h], eax
+        cmp eax, 0FFFFFFFFh
+        jz 1403E96E0h
+        mov ebx, eax
+        lea r12, [167215200h]
+        jmp 1403E8E59h
+
+#
+# ColorCorrection_LoadAsync
+# Deinline file system open
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 4D ?? C7 44 24 ?? ?? ?? ?? ?? BA
+
+      patch: |
+        mov qword ptr [rsp+2a0h],r15
+        lea r8, [rsp+20h]
+        lea edx, [r9d+3]
+        lea rcx, [rbp+50h]
+        call 140439300h
+        cmp eax, 0FFFFFFFFh
+        jz 1405AAD8Eh
+        mov r15d, eax
+        mov eax, 1
+        mov dword ptr [rsp+44h], r15d
+        mov r13, qword ptr [rsp+20h]
+        mov edx, 23188h
+        cmp r13, rdx
+        jz 1405AAA86h
+        jmp 1405AAA1Dh
+
+
+#
+# TextureStreamMgr_GetStreamOverlay
+# Write qwords instead of dwords
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 44 89 54 24 ?? 44 89 4C 24 ?? 44 8B 0D
+
+      patch: |
+        mov qword ptr [rsp+0x38], r10
+        mov qword ptr [rsp+0x30], r9
+
+#
+#  Pak_ProcessAssets
+#  Jump straight into some streaming func instead, idek
+#
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 55 56 57 41 54 41 55 48 83 EC ?? 48 8B 59
+
+      patch: |
+        nop
+        nop
+        nop
+        mov eax, [rbx+1D0h]
+        neg eax
+        sbb ecx, ecx
+        and ecx, 5
+        call 1403F4F80h
+        jmp 14075F63Fh
+
+
+#
+# Pak_StartLoading
+# Allow 
+#
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 75 ?? 4C 8D 84 24 ?? ?? ?? ?? B9
+
+      patch: |
+        jmp 140440490h 
+
+
+#
+# sub_14075F460
+# Not sure
+#
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 33 C9 E8 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? 48 8B 01 FF 90 ?? ?? ?? ?? 83 BB
+
+      patch: |
+        mov eax, [rbx+1D0h]
+        neg eax
+        sbb ecx, ecx
+        and ecx, 5
+        call 1403F4F80h
+
+
+#
+# sub_1403F4D10
+# 
+#
+#
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: false
+      byte_restore_pos: trailing
+
+      sig: 48 83 C4 40 5F 48 FF 60 78 CC CC CC CC CC CC CC CC CC CC CC CC CC
+
+      patch: |
+        call qword ptr [rax+78h]
+        mov ecx, dword ptr [1635A7A48h]
+        mov eax, 0AAAAAAABh
+        mov rbx, qword ptr [rsp+50h]
+        inc ecx
+        mul ecx
+        mov dword ptr [1635A7A4Ch], 0 
+        shr edx, 1
+        lea eax, [rdx+rdx*2]
+        sub ecx, eax
+        mov dword ptr [1635A7A48h], ecx
+        add rsp, 40h
+        pop rdi
+        ret
+
+
+#
+# sub_1405B9F40
+#
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 81 78 ?? ?? ?? ?? ?? 48 89 05
+
+      patch: |
+        cmp qword ptr [rax+10h], 200h
+        mov qword ptr [14D40B2C0h], rax
+        jbe 1405B9FBEh
+        mov r9d, 200h
+
+
+#
+# sub_1405F2320
+# Jump out completely if we couldnt get a trace slot
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 33 C0 8B C8 EB
+
+      patch: |
+        jmp 1405F252Dh
+
+
+#
+# sub_1408AD720
+# Jump out completely if we couldnt get a trace slot
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 44 8B C1 EB ?? 8B C3
+
+      patch: |
+        nop
+        nop
+        nop
+        nop
+        nop
+
+#
+# sub_1408AD8D0
+# Jump out completely if we couldnt get a trace slot
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 8B CA EB 3D 8B C3 25 FF 1F 00 00 48 8D 0C C0 48 C1 E1 06 48 8D 05 F9 B2 F3 23
+
+      patch: |
+        nop
+        nop
+        nop
+        nop
+
+
+#
+# sub_140951D30
+# Jump out completely if we couldnt get a trace slot
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 8B CA EB 3D 8B C3 25 FF 1F 00 00 48 8D 0C C0 48 C1 E1 06 48 8D 05 94 6E E9 23
+
+      patch: |
+        nop
+        nop
+        nop
+        nop
+
+
+#
+# sub_140622D70
+# Enable depth testing on box overlay
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 44 24 ?? ?? 48 8D 15 ?? ?? ?? ?? 44 89 64 24
+
+      patch: |
+        mov byte ptr [rsp+40h], 0
+
+#
+# sub_140622D70
+# Enable depth testing on box overlay
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 44 24 ?? ?? F3 0F 11 45 ?? F3 0F 10 45
+
+      patch: |
+        mov byte ptr [rsp+40h], 0
+
+#
+# sub_140735D40
+# Reduce alpha channel for AddBoxOverlay
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C7 44 24 ?? ?? ?? ?? ?? C7 44 24 ?? ?? ?? ?? ?? C7 44 24 ?? ?? ?? ?? ?? C7 44 24 ?? ?? ?? ?? ?? FF 50 ?? 48 8B 05
+
+      patch: |
+        mov dword ptr [rsp+38h], 10h
+
+
+#
+# CSOM_Shutdown
+# Change address of voicebus miles data
+#
+# Buffers were shifted because of a different sample rate being used with a miles upgrade
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 1D BC E2 A7 28
+
+      patch: |
+        lea rdx, [1693D24B8h]
+
+#
+# CSOM_Initialize
+# Increase voice comm bus miles event count
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 C7 05 ?? ?? ?? ?? ?? ?? ?? ?? C6 05 ?? ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B 1D
+
+      patch: |
+        mov qword ptr [14D4DF250h], 0Ch
+
+
+#
+# CSOM_Initialize
+# Change address of voicebus miles data
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 1D ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? 48 8D 3D
+
+      patch: |
+        lea rbx, [1693D24B8h]
+        mov rcx, qword ptr [1655B96F0h]
+        lea rdi, [1693D24A4h]
+
+
+#
+# CSOM_Initialize
+# Set correct voice bus sample rate for upgraded miles project
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 41 B9 ?? ?? ?? ?? 8B C6
+
+      patch: |
+        mov r9d, 3E80h
+        mov eax, esi
+        xor r8d, r8d
+        imul rdx, rax, 0FA20h
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 81 C7 ?? ?? ?? ?? 48 81 C3 ?? ?? ?? ?? 83 FE
+
+      patch: |
+        add rdi, 0FA20h
+        add rbx, 0FA20h
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 B8 ?? ?? ?? ?? ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? 4C 2B C1
+
+      patch: |
+        mov rax, 603538ACF83226Bh
+        lea rcx, [1693C2AA0h]
+        sub r8, rcx
+        mul r8
+        mov rax, 20C49BA5E353F7CFh
+        shr rdx, 0Fh
+        imul rbx, rdx, 0FA20h
+
+#
+# sub_1409AFF80
+#
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C7 84 93 ?? ?? ?? ?? ?? ?? ?? ?? 48 63 BB
+
+      patch: |
+        mov dword ptr [rbx+rdx*4+0FA00h], 0
+        movsxd rdi, dword ptr [rbx+0FA10h]
+        call [1412971F0h]
+        cmp eax, 2
+        jnz 1409B0034h
+        cmp dword ptr [rbx+rdi*4+0FA00h], 0
+        mov rcx, rdi
+        jbe 1409B0034h
+        mov eax, [rbx+0FA10h]
+        imul rdx, rcx, 3E80h
+        inc eax
+        mov rcx, rsi
+        and eax, 3
+        add rdx, rbx
+        mov [rbx+0FA10h], eax
+        mov r8d, [rbx+rdi*4+0FA00h]
+
+#
+# sub_1409B0050
+#
+#
+
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 69 F8 ?? ?? ?? ?? 48 8B 05
+
+      patch: |
+        imul rdi, rax, 0FA20h
+
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 46 0F B6 84 27
+
+      patch: |
+        movzx r8d, byte ptr [rdi+r12+0FA14h]
+        lea rdx, [r12+0FA00h]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 42 C6 84 27 ?? ?? ?? ?? ?? EB
+
+      patch: |
+        mov byte ptr [rdi+r12+0FA14h], 0
+        jmp label_1
+        mov eax, dword ptr [rdi+r12+0FA04h]
+        lea ecx, [r11+r11]
+        add eax, dword ptr [rdi+r12+0FA08h]
+        add eax, dword ptr [rdi+r12+0FA0Ch]
+        add eax, [rdx]
+        add ecx, eax
+        cmp ecx, r9d
+        jle label_2
+        mov eax, dword ptr [rdi+r12+0FA10h]
+        mov dword ptr [r15+rax*4+0FA00h], 0
+        mov byte ptr [rdi+r12+0FA14h], 1
+        jmp 1409B0272h
+        label_2:
+        test r8b, r8b
+        jnz 1409B0272h
+        label_1:
+        cmp rbx, 3E80h
+        ja 1409B0272h
+        mov ecx, dword ptr [rdi+r12+0FA04h]
+        add ecx, dword ptr [rdi+r12+0FA08h]
+        add ecx, dword ptr [rdi+r12+0FA0Ch]
+        mov rax, qword ptr [142336538h]
+        add ecx, dword ptr [rdi+r12+0FA00h]
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 42 8B 8C 27 ?? ?? ?? ?? 48 8D B1
+
+      patch: |
+        mov ecx, [rdi+r12+0FA10h]
+        lea rsi, [rcx+3E80h]
+        mov edx, [r15+rsi*4]
+        lea rax, [rdx+rbx]
+        cmp rax, 3E80h
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 42 8B 8C 27 ?? ?? ?? ?? 48 8D B1
+
+      patch: |
+        mov ecx, [rdi+r12+0FA10h]
+        lea rsi, [rcx+3E80h]
+        mov edx, [r15+rsi*4]
+        lea rax, [rdx+rbx]
+        cmp rax, 3E80h
+        jbe label_1
+        mov dword ptr [r15+rsi*4], 0
+        jmp 1409B026Ah
+        label_1:
+        mov qword ptr [rsp+0AC98h], r14
+        mov r8, rbx
+        imul r14, rcx, 3E80h
+        lea r14, [r14+rdx]
+        mov rdx, rbp
+        add rcx, r15
+        call 14119E100h
+        add [r15+rsi*4], ebx
+        mov rcx, [rdi+r12+0FA18h]
+        call 1412971F0h
+        cmp eax, 3
+        jnb 1409B0262h
+        mov rcx, [rdi+r12+0FA18h]
+        call 1412971F0h
+        cmp eax, 4
+        jnb 1409B0262h
+        mov eax, [rdi+r12+0FA10h]
+        lea rdx, [r14+r15]
+        mov rcx, [rdi+r12+0FA18h]
+        inc eax
+        and eax, 3
+        mov [rdi+r12+0FA10h], eax
+
+
+#
+# sub_140AFC030
+# Increase allocation size by 8 bytes
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: BA ?? ?? ?? ?? 48 8B C8 41 FF 50 ?? 48 85 C0 74 ?? 48 8D 48 ?? 48 83 E1 ?? 48 89 41 ?? E8
+
+      patch: |
+        mov edx, 1DFh
+
+
+#
+# sub_140B95A40
+# Fix incorrect duration value passed to AddSweptBoxOverlay
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: F3 44 0F 11 74 24 ?? 48 03 D0
+
+      patch: |
+        movss dword ptr [rsp+58h], xmm14
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: F3 44 0F 11 74 24 ?? 4C 03 C0
+
+      patch: |
+        movss dword ptr [rsp+58h], xmm14
+
+#
+# cast_hull_command_completion
+# fix incorrect duration passed to AddSweptBoxOverlay
+#
+#
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: false
+      byte_restore_pos: trailing
+
+      sig: F3 0F 11 74 24 ?? 4C 8D 4D
+
+      patch: |
+        lea r9, [rbp-60h]
+        lea r8, [rbp]
+        movss dword ptr [rsp+58h], xmm6
+        mov byte ptr [rsp+38h], bl
+        mov dword ptr [rsp+48h], 0FFh
+        mov dword ptr [rsp+40h], 0FFh
+        mov dword ptr [rsp+38h], ebx
+        mov dword ptr [rsp+30h], ebx
+        mov qword ptr [rsp+28h], rdx
+        lea rdx, [rbp-70h]
+        mov qword ptr [rsp+20h], rdx
+        lea rdx,[rbp-50h]
+        call qword ptr [rax+60h]
+        jmp 140D30021h
+
+#
+# CServerGameDLL::DLLInit
+# Reduce numTextures max to 512 from 513
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 81 7F
+
+      patch: |
+        cmp qword ptr [rdi+10h], 200h
+        mov qword ptr [14D4EE8A8h], rdi
+        jbe 140D55978h
+        mov r9d, 200h
+
+#
+# Pak_GetValidAssetGUID
+# Dont generate the guid twice for no reason
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 5C 24 ?? 57 48 83 EC ?? F6 C1 ?? 48 8D 05
+
+      patch: |
+        mov qword ptr [rsp+8h], rbx
+        push rdi
+        sub rsp, 20h
+        test cl, 3
+        lea rax, [14046CD70h]
+        lea rbx, [14046CD60h]
+        cmovnz rbx, rax
+        call rbx
+        test rax, rax
+        jz retn_0
+        mov rcx, rax
+        mov rdi, rcx
+        call 140442170h
+        test rax, rax
+        jz retn_0
+        mov rax, rdi
+        mov rbx, qword ptr [rsp+30h]
+        add rsp, 20h
+        pop rdi
+        ret
+        retn_0:
+        xor eax, eax
+        mov rbx, qword ptr [rsp+30h]
+        add rsp, 20h
+        pop rdi
+        ret
+
+#
+# FireWeaponBolt 
+# Add null check for return of CreateWeaponBolt
+#
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 8B 4D ?? 48 8B F0
+
+      patch: |
+        test rax, rax
+        jz 141014AD3h
+
+
+#
+# Fix null deref in CreatePlayerWaypoint
+#
+
+#
+#
+# Jump back broken for this patch
+#
+#
+#
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 39 B8 ?? ?? ?? ?? 74 ?? 0F B7 40 ?? 66 83 F8 ?? 74 ?? 48 8B 15
+
+      patch: |
+        test rbx, rbx
+        jz 140C0B1E0h
+        cmp [rax+0B10h], edi
+
+
+#
+# Fix null deref in CreatePlayerPOI
+#
+#
+#
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 44 8B 8D ?? ?? ?? ?? 48 8B F8
+
+      patch: |
+        test rax, rax
+        jz 140C0B83Fh
+
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 48 8B C4 48 89 58 ?? 48 89 78 ?? 55 48 8D 68 ?? 48 81 EC ?? ?? ?? ?? 48 8B FA
+
+      patch: |
+        cmp qword ptr [rdx+10h], 0
+        jz 140CE57A3h
+
+
+#
+# SQLexer::Init
+# Expand initial table size to better match expected size of 70+
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 41 8D 56 ?? E8 ?? ?? ?? ?? 48 89 47
+
+      patch: |
+        lea edx, [r14+53h]
+
+
+# Exploitable defects
+
+# This fixes a stack smash in 'CNetChan::ProcessSubChannelData' caused by the last fragment
+# of a split packet, which could exceed the stack allocated buffer size of 560 bytes.
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 44 8D 04 ED ?? ?? ?? ?? 48 8B CB 48 8D 54 24
+
+      # Check if fragment size of 'last' split packet doesn't exceed stack buffer size.
+      # Jump to gadget (xor al, al; pop..; ret;).
+      patch: |
+        cmp rbp, 230h
+        jg 140261CE6h
+
+# This fixes a vulnerability in which the index field in the NET_SetConVar message
+# could be used to read outside the static userinfo cvar string array.
+# The oversize check was missing causing OOB reads! String array size is 0x27,
+# so only index into it if its within bounds..
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 75 ?? 41 B8 ?? ?? ?? ?? 48 89 7C 24 ?? 48 8B CB
+
+      patch: |
+        jz read_name
+        cmp eax, 28h
+        jb 14030E951h
+        read_name:
+        mov r8d, 104h
+
+# This fixes a vulnerability in which the SQClass' '_members' buffer could overrun due to a missing check for current member count in the class.
+# This has been patched on the Squirrel repo in commit: https://github.com/albertodemichelis/squirrel/commit/23a0620658714b996d20da3d4dd1a0dcf9b0bd98
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+      jump_back: false
+      byte_restore_pos: trailing
+
+      sig: 8B 0E 48 8B 7D
+
+      patch: |
+        mov rcx, qword ptr [rbx+40h]
+        mov eax, dword ptr [rcx+54h]
+        cmp eax, 0FFFFFFh
+        jge exit
+        mov ecx, [rsi]
+        mov rdi, [rbp-38h]
+        jmp 14106819Bh
+        exit:
+        xor bl, bl
+        jmp 141068429h
+
+#
+# NET_ReceiveDatagram
+# Fix incorrect return condition, oversized packets should not cause a return but should instead continue listening for more packets
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 0F 8D ?? ?? ?? ?? 48 8B 47 ?? 83 38
+
+      patch: |
+        jge 140265650h
+
+#
+# NET_ReceiveDatagram
+# Fix incorrect return condition, we should keep listening if we get malformed LZSS data
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 0F 84 ?? ?? ?? ?? 81 3B
+
+      patch: |
+        jz 140265650h
+        cmp dword ptr [rbx], 53535A4Ch
+        jnz 140265650h
+        movsxd rsi, dword ptr [rbx+4]
+        lea eax, [rsi-1]
+        cmp eax, 3FFFFh
+        ja 140265650h
+
+#
+# MTX_ReadUserMsg_OpenedPack
+# Clamp size to stack size
+#
+
+#Borked auto return, debug this
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: false
+      byte_restore_pos: trailing
+
+      sig: 45 84 F6 74 ?? 48 8D 5D
+
+      patch: |
+        cmp r14b, 10h
+        jnb 1402A8338h
+        test r14b, r14b
+        jz 1402A7F33h
+        jmp 1402A7F00h
+
+#
+# CClient::ProcessVoiceData
+# This patch fixes a stack buffer overflow due to the net message length field being passed straight to bf_read::ReadBits
+#
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 44 8B 42 ?? 48 8B F9 48 8D 4A ?? 48 8B DA 48 8D 54 24
+
+      patch: |
+        mov r8d, [rdx+20h]
+        cmp r8d, 1000h
+        jg 1403069B1h
