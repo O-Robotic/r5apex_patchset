@@ -17,6 +17,10 @@ jobs:
   build_OOADump:
     runs-on: ubuntu-latest
     steps:
+
+      - name: Checkout self
+        uses: actions/checkout@v7
+
       - name: Get latest release tag
         shell: bash
         run:  |
@@ -63,6 +67,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     
+    - name: Checkout self
+      uses: actions/checkout@v7
+
     - name: Get latest release tag
       shell: bash
       run:  |
