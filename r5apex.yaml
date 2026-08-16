@@ -1481,8 +1481,7 @@ patches:
       sig: 48 39 B4 C5
 
       patch: |
-        mov r10, 167181688h
-        mov r11, qword ptr [r10]
+        mov r11, qword ptr [167181688h]
         cmp qword ptr [r11+rax*8], rsi
 
 # Same process is repeated here for the other use cases (note that register usage is different due to contextual reasons):
@@ -1497,8 +1496,7 @@ patches:
       sig: 48 39 BC C5
 
       patch: |
-        mov r10, 167181688h
-        mov rcx, qword ptr [r10]
+        mov rcx, qword ptr [167181688h]
         cmp qword ptr [rcx+rax*8], rdi
 
 
@@ -1512,8 +1510,7 @@ patches:
       sig: 48 8B 94 C5 ?? ?? ?? ?? 69 C2 ?? ?? ?? ?? 48 C1 EA ?? C1 C0 ?? 69 C8 ?? ?? ?? ?? 69 C2 ?? ?? ?? ?? C1 C1 ?? C1 C0 ?? 81 C1 ?? ?? ?? ?? 69 C0 ?? ?? ?? ?? 44 8D 04 89 44 33 C0 41 C1 C0 ?? 41 81 C0 ?? ?? ?? ?? 43 8D 0C 80 83 F1 ?? 8B C1 C1 E8 ?? 33 C1 69 C8 ?? ?? ?? ?? 8B C1 C1 E8 ?? 33 C1 69 C8 ?? ?? ?? ?? 8B D1 C1 EA ?? 33 D1 45 33 C0 66 66 0F 1F 84 00
 
       patch: |
-        mov r8, 167181688h
-        mov rdx, qword ptr [r8]
+        mov rdx, qword ptr [167181688h]
         mov rdx, qword ptr [rdx+rax*8]
 
     - type: code
@@ -1526,8 +1523,7 @@ patches:
       sig: 48 8B 94 C5 70 40 00 00 69 C2 51 2D 9E CC 48 C1 EA 20 C1 C0 0F 69 C8 93 35 87 1B 69 C2 51 2D 9E CC C1 C1 0D C1 C0 0F 81 C1 14 AF DD FA 69 C0 93 35 87 1B 44 8D 04 89 44 33 C0 41 C1 C0 0D 41 81 C0 14 AF DD FA 43 8D 0C 80 83 F1 08 8B C1 C1 E8 10 33 C1 69 C8 6B CA EB 85 8B C1 C1 E8 0D 33 C1 69 C8 35 AE B2 C2 8B D1 C1 EA 10 33 D1 45 33 C0 23 15 42 1B DA 26
 
       patch: |
-        mov r8, 167181688h
-        mov rdx, qword ptr [r8]
+        mov rdx, qword ptr [167181688h]
         mov rdx, qword ptr [rdx+rax*8]
 
     - type: code
