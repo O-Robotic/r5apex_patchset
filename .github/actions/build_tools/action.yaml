@@ -28,7 +28,7 @@ runs:
       with:
         repository: ${{ inputs.repo }}
         path: ${{ inputs.clone_dir }}
-        tag: ${{ inputs.tag }}
+        ref: ${{ inputs.tag }}
 
     - name: Configure
       shell: bash
