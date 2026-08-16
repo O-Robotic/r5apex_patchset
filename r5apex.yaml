@@ -3136,7 +3136,7 @@ patches:
       sig: 48 8D 1D BC E2 A7 28
 
       patch: |
-        lea rdx, [1693D24B8h]
+        lea rbx, [1693D24B8h]
 
 #
 # CSOM_Initialize
