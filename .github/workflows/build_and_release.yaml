@@ -41,37 +41,37 @@ jobs:
           retention-days: 7
 
 
-  build_BinPatch:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Setup CMake
-      uses: lukka/get-cmake@latest
+  #build_BinPatch:
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #  - name: Setup CMake
+  #    uses: lukka/get-cmake@latest
 
-    - name: Install Ninja
-      run: sudo apt-get update && sudo apt-get install -y ninja-build
+  #  - name: Install Ninja
+  #    run: sudo apt-get update && sudo apt-get install -y ninja-build
 
-    - name: Checkout BinPatch
-      uses: actions/checkout@v7
-      with:
-        repository: 'O-Robotic/BinPatch'
-        path: binpatch
+  #  - name: Checkout BinPatch
+  #    uses: actions/checkout@v7
+  #    with:
+  #      repository: 'O-Robotic/BinPatch'
+  #      path: binpatch
 
-    - name: Configure BinPatch
-      run: cmake -S ${{ github.workspace }}/binpatch -B ${{ github.workspace }}/binpatch/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${{ github.workspace }}
+  #  - name: Configure BinPatch
+  #    run: cmake -S ${{ github.workspace }}/binpatch -B ${{ github.workspace }}/binpatch/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${{ github.workspace }}
 
-    - name: Build BinPatch
-      run: cmake --build ${{ github.workspace }}/binpatch/build --config Release --parallel
+  #  - name: Build BinPatch
+  #    run: cmake --build ${{ github.workspace }}/binpatch/build --config Release --parallel
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v7
-      with:
-        name: binpatch
-        path: BinPatch
-        if-no-files-found: error
-        retention-days: 7
+  #  - name: Upload Artifact
+  #    uses: actions/upload-artifact@v7
+  #    with:
+  #      name: binpatch
+  #      path: BinPatch
+  #      if-no-files-found: error
+  #      retention-days: 7
 
   unpack_and_patch:
-    needs: [build_OOADump, build_BinPatch]
+    needs: [build_OOADump]
 
     runs-on: ubuntu-latest
     env:
@@ -91,40 +91,40 @@ jobs:
           chmod +x OOADump
           ./OOADump --outputfile r5apex.unpacked.exe r5apex.exe
 
-      - name: Create Output Dir
-        run: mkdir out
+      #- name: Create Output Dir
+      #  run: mkdir out
 
-      - name: Patch Executable
-        run: |
-          chmod +x BinPatch
-          ./BinPatch -input r5apex.unpacked.exe -patch r5apex.yaml -output out/r5apex.exe
+      #- name: Patch Executable
+      #  run: |
+      #    chmod +x BinPatch
+      #    ./BinPatch -input r5apex.unpacked.exe -patch r5apex.yaml -output out/r5apex.exe
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: r5apex
-          path: out/r5apex.exe
-          if-no-files-found: error
-          retention-days: 7
+      #- name: Upload Artifact
+      #  uses: actions/upload-artifact@v7
+      #  with:
+      #    name: r5apex
+      #    path: out/r5apex.exe
+      #    if-no-files-found: error
+      #    retention-days: 7
 
-  release:
-    needs: unpack_and_patch
-    runs-on: ubuntu-latest
+  #release:
+  #  needs: unpack_and_patch
+  #  runs-on: ubuntu-latest
 
-    env:
-      TAG: ${{ inputs.release_tag || github.ref_name }}
+  #  env:
+  #    TAG: ${{ inputs.release_tag || github.ref_name }}
 
-    steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v8
-        with:
-          pattern: r5apex
-          merge_multiple: true
-          path: rel
+  #  steps:
+  #    - name: Download Artifact
+  #      uses: actions/download-artifact@v8
+  #      with:
+  #        pattern: r5apex
+  #        merge_multiple: true
+  #        path: rel
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v3
-        with:
-          tag_name: ${{ env.TAG }}
-          files: rel/*
+  #    - name: Create Release
+  #      uses: softprops/action-gh-release@v3
+  #      with:
+  #        tag_name: ${{ env.TAG }}
+  #        files: rel/*
     
