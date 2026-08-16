@@ -102,12 +102,7 @@ patches:
     - type: data
       section: .rdata
       offset: 0x4BAF0
-      string: "SOCKS5 server authenticated user %s with GSS-API."
-
-    #- type:
-    #  section: .rdata
-    #  offset:
-    #  string: 
+      string: "SOCKS5 server authenticated user %s with GSS-API.\n"
 
     - type: data
       section: .rdata
@@ -124,19 +119,943 @@ patches:
       offset: 0xA94B8
       string: "language"
 
+    # Change the default value string for enable_debug_overlays to 0 instead of 1
+    - type: data
+      section: .data
+      offset: 0x216C0
+      bytes: [0x90, 0x47, 0x32, 0x41, 0x01]
+
+    # Spelling mistake in memtest recommendation error
+    - type: data
+      section: .rdata
+      offset: 0x4EDC1
+      nullterm: false
+      string: "hly than your BIOS"
+
+    - type: data
+      section: .rdata
+      offset: 0x8E078
+      string: "EnsureCapacity( %zd ) called for external buffer of size %zd.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x973C0
+      string: "LoadPlayerConfig: g_pFileSystem == NULL\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x98430
+      string: "udp/ip  : [%s]:%i os(%s) type(%s)\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x984D0
+      string: "# userid name uniqueid connected ping loss state rate\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x98508
+      string: " adr\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x98788
+      string: "changelevel %s\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x99050
+      string: "Set the sp text for the load screen. This is cleared to the default after each load."
+
+    - type: data
+      section: .rdata
+      offset: 0x9A488
+      string: "0: don't draw; 1: draw normal; 2: draw bones; 3: draw hulls"
+
+    - type: data
+      section: .rdata
+      offset: 0x9B738
+      string: "'max_teams' (%u) is too high (max: %d).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x9EF50
+      string: "Server is switching to playlist with max teams of '%llu' (was '%llu') and cannot reassign teams at this time"
+
+    - type: data
+      section: .rdata
+      offset: 0x9FCF8
+      string: "Draws the vgui panel hierarchy to the specified depth level."
+
+    - type: data
+      section: .rdata
+      offset: 0xA0400
+      string: "DataBlockFragment overflowed [%zu][%lu]"
+
+    - type: data
+      section: .rdata
+      offset: 0xA11C0
+      string: "Frame rate limiter. -1 indicates the use of desktop refresh. 0 is unlocked."
+
+    - type: data
+      section: .rdata
+      offset: 0xA1298
+      string: "Frame rate limiter when vsync is enabled."
+
+    - type: data
+      section: .rdata
+      offset: 0xA7460
+      string: "Sets the base layer animation for chroma hardware. gradient maps values 0-1 to colors."
+
+    - type: data
+      section: .rdata
+      offset: 0xA8188
+      string: "CL_TransitionEntityToSnapshot: Error creating entity %s(%i).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xA81C8
+      string: "CL_TransitionEntityToSnapshot: Invalid recv table for ent %d.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xa84C0
+      string: "Use the actual delta time for motion instead of a super complicated system based on the server frame rate."
+
+    - type: data
+      section: .rdata
+      offset: 0xA8C78
+      string: "File '%s' size %zd is too small to process.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xA8E70
+      string: "CL_RegisterResources: host_state.worldmodel/GetBaseLocalClient().GetModel( 1 ) == NULL\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xA8F20
+      string: "connectWithToken"
     
+    - type: data
+      section: .rdata
+      offset: 0xAD648
+      string: "net_connectPacketWarningThreshold"
 
+    - type: data
+      section: .rdata
+      offset: 0xADDE0
+      string: "Received future spawn count %i in signon state msg %s when we thought we were on server count %i\n"
 
-    #- type: code
-    #  segment: .text
-    #  mode: replace
+    - type: data
+      section: .rdata
+      offset: 0xAE098
+      string: "CL_ParsePacketEntities: buffer read overflow\n"
 
-    #  sig: F2 0F 10 0D ?? ?? ?? ?? F3 0F 10 15 ?? ?? ?? ?? 0F 5A C0 F2 0F 5D C8
-    #  patch: |
-    #    movss xmm2, dword ptr [1415BB7F4h]
-    #    divss xmm2, xmm0
-    #    jmp 14029729Ah
+    - type: data
+      section: .rdata
+      offset: 0xB09A0
+      string: "ProcessUserCmds: Incorrect reading frame (check sending and receiving code for mismatches)!\n"
 
+    - type: data
+      section: .rdata
+      offset: 0xB0A00
+      string: "ProcessUserCmds: Overflowed reading usercmd data (check sending and receiving code for mismatches)!\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xB1D38
+      string: "Player's account is already on the server.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xB1F98
+      string: "C2S_CONNECT desync.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xB2018
+      string: "Invalid challenge packet.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xB20E8
+      string: "%s overflowed reliable channel\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xB2AB8
+      string: "mp_huge_threshold"
+
+    - type: data
+      section: .rdata
+      offset: 0xB58F0
+      string: "CURL: not enough memory (realloc returned NULL) - tried to allocate %zu bytes\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xB58F0
+      string: "CURL: not enough memory (realloc returned NULL) - tried to allocate %zu bytes\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xB5F38
+      string: "TITANFALL2-PC-SERVER"
+
+    - type: data
+      section: .rdata
+      offset: 0xBC538
+      string: "%s: length %llu, defFileVersion %s"
+
+    - type: data
+      section: .rdata
+      offset: 0xBC650
+      string: "%s: team %llu"
+
+    - type: data
+      section: .rdata
+      offset: 0xBC7D8
+      string: "%s: needs decoder: %s, bytes %i"
+
+    - type: data
+      section: .rdata
+      offset: 0xBC828
+      string: "client should load their local sendtable file"
+
+    - type: data
+      section: .rdata
+      offset: 0xBCF80
+      string: "Hit PDATA_MAX_ENUM_ITEM_NAMES limit of %llu items."
+
+    - type: data
+      section: .rdata
+      offset: 0xBCFB8
+      string: "Hit PDATA_MAX_ITEMS_DEFS limit of %llu items."
+
+    - type: data
+      section: .rdata
+      offset: 0xBD1B8
+      string: "Cannot define new enum '%s', already at limit of %llu enums.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xBD880
+      string: "Datadef requires %llu bytes, max allowed by code is only %llu.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xBD930
+      string: "Hit limit of %llu base vars with line: %s\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xBDFC0
+      string: "PersistenceRecieveBaseline() error receiving string for item #%llu (\"%s\")."
+
+    - type: data
+      section: .rdata
+      offset: 0xBE2F8
+      string: "Controls the running of a low-pass filter to help remove DC."
+
+    - type: data
+      section: .rdata
+      offset: 0xBE338
+      string: "speex_use_preprocess"
+
+    - type: data
+      section: .rdata
+      offset: 0xBFCC4
+      string: "The prefetch is medium priority and persistent."
+
+    - type: data
+      section: .rdata
+      offset: 0xBFD63
+      string: "The prefetch is medium priority and non-persistent."
+    
+    - type: data
+      section: .rdata
+      offset: 0xC0CA8
+      string: "failed to read %zd bytes\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xC0E38
+      string: "%s%s%s%s fnumber=%d ofs=%ju crc=0x%x fcompsz=%llu fsz=%ju"
+
+    - type: data
+      section: .rdata
+      offset: 0xC40F0
+      string: "Mode 0 is total free memory(excluding garlic), 1 is small block heap, 2 is Client Script, 3 is UI Script"
+
+    - type: data
+      section: .rdata
+      offset: 0xC81D0
+      string: "%d linkedTextures loaded\n%d/%d mip levels loaded\n%zd kiB/%zd kiB loaded\nActive mode: '%s'(%d)\n\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xC82E8
+      string: "Resident pages (max page size %zd bytes):\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xC8480
+      string: " + '%s' (%i res/%i strm/%i total) "
+
+    - type: data
+      section: .rdata
+      offset: 0xC8528
+      string: "<no activePageState (page loading???)>\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xC9D68
+      string: "..\\cfg\\dxsupport.cfg"
+
+    - type: data
+      section: .rdata
+      offset: 0xCE430
+      string: "Allow post-processing when debug views are enabled."
+
+    - type: data
+      section: .rdata
+      offset: 0xCF1B0
+      string: "0 for no fade out on silhouette, 1 for fade out on silhouette"
+
+    - type: data
+      section: .rdata
+      offset: 0xD18B0
+      string: "Error reading pak file \"%s\" -- decompressed size %zu doesn't match expected value %zu\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xD2388
+      string: "Invalid escape character %c at %s."
+
+    - type: data
+      section: .rdata
+      offset: 0xD23B0
+      string: "Unicode escape is not four hex digits at %s."
+
+    - type: data
+      section: .rdata
+      offset: 0xD5248
+      string: "%s failed on span %p+%u, size %zu, type %u."
+
+    - type: data
+      section: .rdata
+      offset: 0xD52B0
+      string: "%p: %p+%08I64x (RSV%s )\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xD5520
+      string: "Convar '%s' is flagged as both FCVAR_ARCHIVE and FCVAR_ARCHIVE_PLAYERPROFILE.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1040E0
+      string: "ArameMono"
+
+    - type: data
+      section: .rdata
+      offset: 0x110AF0
+      string: "qhull internal error (point_add): point p%d is out of bounds (%d)\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x110BD0
+      string: "qh_vertexneighbors: determining neighboring facets for each vertex\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x11A848
+      string: "Get the attachment id's right vector"
+    
+    - type: data
+      section: .rdata
+      offset: 0x11A870
+      string: "Get the attachment id's forward vector"
+
+    - type: data
+      section: .rdata
+      offset: 0x11A8B0
+      string: "Get the attachment id's up vector"
+
+    - type: data
+      section: .rdata
+      offset: 0x11A9A0
+      string: "Get the attachment id's origin vector on a viewmodel entity without the FOV adjustment"
+
+    - type: data
+      section: .rdata
+      offset: 0x11AB78
+      string: "Get the attachment id's origin vector"
+
+    - type: data
+      section: .rdata
+      offset: 0x11AC58
+      string: "Get the attachment id's angles as a p,y,r vector"
+
+    - type: data
+      section: .rdata
+      offset: 0x11B9F0
+      string: "Pause the current animation started by Anim_Play*(). Used by the animation previewer."
+
+    - type: data
+      section: .rdata
+      offset: 0x11FD70
+      string: "The position between the entity's eyes."
+
+    - type: data
+      section: .rdata
+      offset: 0x121E60
+      string: "Force entity to have shadows even if it isn't visible to the client.  Useful for making the thirdperson model cast a shadow while in first person."
+
+    - type: data
+      section: .rdata
+      offset: 0x123800
+      string: "Allows ent to have aimassist applied to them on non phased players while they are phased"
+
+    - type: data
+      section: .rdata
+      offset: 0x123950
+      string: "Get the named attachment id"
+
+    - type: data
+      section: .rdata
+      offset: 0x123B70
+      string: "Sets the direction the shot has to come from to pass the ent"
+
+    - type: data
+      section: .rdata
+      offset: 0x125650
+      string: "ent_repack_threshold"
+
+    - type: data
+      section: .rdata
+      offset: 0x1262F8
+      string: "UiData%llu"
+
+    - type: data
+      section: .rdata
+      offset: 0x130440
+      string: "Checks if grapple hook is deployed (not necessarily attached)."
+
+    - type: data
+      section: .rdata
+      offset: 0x130CB8
+      string: "Get a titan available for smart targeting type uses."
+
+    - type: data
+      section: .rdata
+      offset: 0x133730
+      string: "Failed to find model index for model \"%s\". Make sure it is precached.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x16D3C0
+      string: "Set the percentage of the distance that the light will falloff halfway"
+
+    - type: data
+      section: .rdata
+      offset: 0x16FE30
+      string: "How often a caption can repeat, unless overridden by norepeat. (or 0)"
+
+    - type: data
+      section: .rdata
+      offset: 0x16FED0
+      string: "How often a caption can repeat, unless overridden by norepeat. (timeshift only) (or 0)"
+
+    - type: data
+      section: .rdata
+      offset: 0x173B28
+      string: "r_setupBoneWorkerThreshold"
+
+    - type: data
+      section: .rdata
+      offset: 0x173CA0
+      string: "[%-5s Particle Limiter] active systems: %4d cur, %4d avg, %4d limit | active particles: %5d cur, %5d avg, %5d limit"
+
+    - type: data
+      section: .rdata
+      offset: 0x176E00
+      string: "The hitch/choke alerts will use this color."
+
+    - type: data
+      section: .rdata
+      offset: 0x1789E0
+      string: "Toggle Low Res Particle Debug Texture"
+
+    - type: data
+      section: .rdata
+      offset: 0x1796E8
+      string: "When disabled suppresses any update of refract texture."
+
+    - type: data
+      section: .rdata
+      offset: 0x17F768
+      string: "Change the draw group of a RUI instance"
+
+    - type: data
+      section: .rdata
+      offset: 0x1850D0
+      string: "Script_UserHasEAAccess: no engine pointer.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x189E10
+      string: "Returns mic status for a userid on the local players team (passing in uid as string)"
+
+    - type: data
+      section: .rdata
+      offset: 0x18ACA0
+      string: "indicates if you can issue an invite, if not return a reason."
+
+    - type: data
+      section: .rdata
+      offset: 0x19C0D0
+      string: "Enable IK height adjustment"
+
+    - type: data
+      section: .rdata
+      offset: 0x19C120
+      string: "Debugging for IK height adjustment"
+
+    - type: data
+      section: .rdata
+      offset: 0x19C248
+      string: "Test IK height adjustment with a sine wave"
+
+    - type: data
+      section: .rdata
+      offset: 0x19CC30
+      string: "Failed to create a new dynamic prop! Trying to spawn prop on model '%s' with sequence '%s'\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x19CC90
+      string: "Can't create anymore anim props. Trying to spawn prop '%s' on attachment named '%s' on model '%s' with sequence '%s'\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x19E800
+      string: "Attempted to use \"%s\" which has not been precached. Call %s( $\"%s\" ) during level load"
+
+    - type: data
+      section: .rdata
+      offset: 0x1A4980
+      string: "Minimum fraction of desired superjump height that is achieved, even if already moving quickly upwards"
+
+    - type: data
+      section: .rdata
+      offset: 0x1A5E10
+      string: "Beyond wallrun_sameWallDist, wall running is permitted at higher points with this slope"
+
+    - type: data
+      section: .rdata
+      offset: 0x1A6B08
+      string: "Eye height above ledge at which gun is re-enabled"
+
+    - type: data
+      section: .rdata
+      offset: 0x1AAF50
+      string: "Returns whether there are assets loaded from before the game was fully installed--i.e., we need to restart or reload rpaks."
+
+    - type: data
+      section: .rdata
+      offset: 0x1AB370
+      string: "Returns true if the game is partially installed. You can't start sp training if this is false."
+
+    - type: data
+      section: .rdata
+      offset: 0x1ABDC0
+      string: "Returns true if a different signed in user has age restriction to play multiplayer."
+
+    - type: data
+      section: .rdata
+      offset: 0x1ACBE0
+      string: "Call when entering the lobby ( int gamemodeId, int difficultyLevelId )"
+
+    - type: data
+      section: .rdata
+      offset: 0x1AD358
+      string: "Returns true if game is up-to-date in Origin."
+
+    - type: data
+      section: .rdata
+      offset: 0x1CC960
+      string: "PingTraceLine: Error can't use team %i. Values expected are between %i and %i\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1D0250
+      string: "easeIn + easeOut exceeded total movetime!"
+
+    - type: data
+      section: .rdata
+      offset: 0x1D18C0
+      string: "Retrieves an entity (or null) based off an encoded ehandle received from the server. Return null for lightweight entities"
+
+    - type: data
+      section: .rdata
+      offset: 0x1D38C0
+      string: "Days worth of seconds that will be added to the result of GetUnixTimestamp(). Server authoritative."
+
+    - type: data
+      section: .rdata
+      offset: 0x1D4070
+      string: "Too many elements for bodyGroupValues while setting Optic Appearance Override for \"%s\" for weapon \"%s\"."
+
+    - type: data
+      section: .rdata
+      offset: 0x1D5B20
+      string: "Map a value V from C to D. Linear interpolate between A and B mapped to C and D"
+
+    - type: data
+      section: .rdata
+      offset: 0x1E0858
+      string: "challenge_req"
+
+    - type: data
+      section: .rdata
+      offset: 0x1E18F0
+      string: "Hit limit of %llu mod assembly items.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1E1AD0
+      string: "\nParsing weapon info for: %s;\n Value for bodygroup index should be an int. Using 0 as default."
+
+    - type: data
+      section: .rdata
+      offset: 0x1E1B70
+      string: "\nParsing weapon info for: %s;\n Too many optic appearances. Max is %d."
+
+    - type: data
+      section: .rdata
+      offset: 0x1E22B8
+      string: "\nParsing weapon info for: %s;\n Too many UIDatas. Max is %d."
+
+    - type: data
+      section: .rdata
+      offset: 0x1FECF0
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': too many environments (max is currently %i).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FEEC0
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': too many %s controllers (max is currently %i).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF030
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': first environment must be named 'default'.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF0B0
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': two different environments with the same name '%s'.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF150
+      string: "Couldn't initialize sound.\nPlease make sure you have a sound playback device that is enabled and properly configured.\nFailed in: %s\nMiles output follows:\n%s\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF3F8
+      string: "Miles async failed read for '%s' offset %zu count %zu\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF430
+      string: "Miles async failed malloc for '%s' size %zu\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF460
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': duplicate emitter suffix '%s' in environment '%s'.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF4E0
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': Too many unique emitter suffixes, triggered by environment '%s'. (Limited globally to %i).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF4E0
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': Too many unique emitter suffixes, triggered by environment '%s'. (Limited globally to %i).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF6B0
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': couldn't find environment '%s' for 'inherit' in environment '%s' (must have be defined above).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF760
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': two different %s controllers with the same name '%s'.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF8A0
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': too many emitter suffixes in environment '%s' (limit is currently %i).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FFC50
+      string: "Error loading Miles Sound Meter info from 'scripts/audio/soundmeter_busses.rson': Sound meter must provide 'bus' value (a string).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FFDD0
+      string: "Error loading Miles Sound Meter info from 'scripts/audio/soundmeter_busses.rson': Too many sound meters -- code limit is %d.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x200278
+      string: "CSOM_Initialize"
+
+    - type: data
+      section: .rdata
+      offset: 0x201060
+      string: "Sets an additional offset XY for the cockpit panel. (-1, -1) to (1, 1)"
+
+    - type: data
+      section: .rdata
+      offset: 0x202960
+      string: "Given x-y, and left-right-top-bottom boundaries, clamp the X & Y. Returns an array with x and y values."
+
+    - type: data
+      section: .rdata
+      offset: 0x205190
+      string: "Out of room to register client function \"%s\" - Usage: %d/%d entries, %d/%d buffer."
+
+    - type: data
+      section: .rdata
+      offset: 0x209D90
+      string: "%s: Sound name was empty string!\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x209DC0
+      string: "%s: Sound name was empty string! Associated entity debugName is '%s'\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x212440
+      string: "Init spiraling missile"
+
+    - type: data
+      section: .rdata
+      offset: 0x222E18
+      string: "Clear the weapon charm entity for the current weapon."
+
+    - type: data
+      section: .rdata
+      offset: 0x2230D0
+      string: "Set the legendary weapon model index for this instance of the weapon. The weapon will use the default model from weapon info if a negative index is set."
+
+    - type: data
+      section: .rdata
+      offset: 0x23F738
+      string: "top() on an empty array"
+
+    - type: data
+      section: .rdata
+      offset: 0x23FAC0
+      string: "cannot wakeup an idle thread"
+
+    - type: data
+      section: .rdata
+      offset: 0x24D7C0
+      string: "Error loading Miles Bank list from 'scripts/audio/banks.rson': Too many banks -- code limit is %d.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x24D950
+      string: "Error loading Miles Bank list from 'scripts/audio/banks.rson': Only valid key is 'name', not '%s'.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x24DA20
+      string: "Error loading Miles Bank list from 'scripts/audio/banks.rson': Each bank must have exactly one name.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x24F300
+      string: "GetWaypointClusters: No min cluster size provided"
+
+    - type: data
+      section: .rdata
+      offset: 0x24F7C0
+      string: "GetWaypointClusters: No ignore team provided"
+
+    - type: data
+      section: .rdata
+      offset: 0x250BB8
+      string: "Switches back to code control of yaw."
+
+    - type: data
+      section: .rdata
+      offset: 0x266850
+      string: "entity handle isn't an ai\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x2671C0
+      string: "NavMesh_RandomPositions expected 6 parameters"
+
+    - type: data
+      section: .rdata
+      offset: 0x267D40
+      string: "Gets a list of valid data slots for the node in given range (dataSlotsCount slots starting from dataSlotsStart)."
+
+    - type: data
+      section: .rdata
+      offset: 0x269DB0
+      string: "End the moment the animation begins to fade out rather than waiting until the cycle reaches 1"
+
+    - type: data
+      section: .rdata
+      offset: 0x26B018
+      string: "m_lastFootstepDamageOnGround"
+
+    - type: data
+      section: .rdata
+      offset: 0x26B7B0
+      string: "takes a normal weapon at a specific slot index"
+
+    - type: data
+      section: .rdata
+      offset: 0x26F9C0
+      string: "Get entity index of networked entity. Script error if the entity doesn't have an index."
+
+    - type: data
+      section: .rdata
+      offset: 0x2709D0
+      string: "Removes a usable type from the entity. Should not be called often as need to recompute partition mask everytime a new value is removed"
+
+    - type: data
+      section: .rdata
+      offset: 0x273090
+      string: "Displays the total bounding box for the given entity(s) in green.  Some entities will also display entity specific overlays.\n	Arguments:   	{entity_name} / {class_name} / no argument picks what player is looking at "
+
+    - type: data
+      section: .rdata
+      offset: 0x273580
+      string: "Displays the movement bounding box for the given entity(ies) in orange.  Some entities will also display entity specific overlays.\n	Arguments:   	{entity_name} / {class_name} / no argument picks what player is looking at "
+
+    - type: data
+      section: .rdata
+      offset: 0x273A20
+      string: "no such entity: \"%s\"\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x275080
+      string: "In seconds, how long a team must go without seeing an entity before they are no longer considered \"spotted\"."
+
+    - type: data
+      section: .rdata
+      offset: 0x27A670
+      string: "Controls whether the helicopter/rope integration is controlled by the server."
+
+    - type: data
+      section: .rdata
+      offset: 0x27D710
+      string: "Unable to allocate exception."
+
+    - type: data
+      section: .rdata
+      offset: 0x27F4A8
+      string: "Set whether or not to attack targets"
+
+    - type: data
+      section: .rdata
+      offset: 0x2D92A0
+      string: "Gets the player's preferred data center"
+
+    - type: data
+      section: .rdata
+      offset: 0x2D9D40
+      string: "Set override for player arms model to be used instead of the value from player settings. Set to \"\" to use the model from player settings."
+
+    - type: data
+      section: .rdata
+      offset: 0x2D9DD0
+      string: "Set override for player body model to be used instead of the value from player settings. Set to \"\" to use the model from player settings."
+    
+    - type: data
+      section: .rdata
+      offset: 0x2DD430
+      string: "Toggle prop debug mode. If on, props will show color-coded bounding boxes. Red means ignore all damage. White means respond physically to damage but never break. Green maps health in the range of 100 down to 1."
+
+    - type: data
+      section: .rdata
+      offset: 0x2E48D0
+      string: "Plays a sound on a given entity for all players in the vehicle. Unreliable (may be dropped if network traffic is too high)."
+
+    - type: data
+      section: .rdata
+      offset: 0x2E5330
+      string: "Plays particle effect on the vehicle for all players in the vehicle. Unreliable (may be dropped if network traffic is too high)."
+
+    - type: data
+      section: .rdata
+      offset: 0x2E9B50
+      string: "Check the given entity has no player children's attached. If so, it will raise a script error."
+
+    - type: data
+      section: .rdata
+      offset: 0x2EBEB0
+      string: "One player reports cheater to anti-cheat system. ReportCheater( string reportedGUID, string reportingGUID, string descr )"
+
+    - type: data
+      section: .rdata
+      offset: 0x2F16F0
+      string: "Get minimum goal radius for an AI's current AI setting"
+
+    - type: data
+      section: .rdata
+      offset: 0x2F2410
+      string: "Get the overridden maximum sight dist. It will be -1 if it has not been overridden"
+
+    - type: data
+      section: .rdata
+      offset: 0x2FA7F0
+      string: "   Sharing previously established connection\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x307FD8
+      string: "End lag compensation"
+
+    - type: data
+      section: .rdata
+      offset: 0x3089E0
+      string: "Field \"%s\" is a dynamic array, but settings header finder requested a specific array index (dynamic array lookup can only be done at runtime) (settings layout \"%s\")\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x31FC20
+      string: "not enough parameters for the given format string"
+
+    - type: data
+      section: .rdata
+      offset: 0x31FF48
+      string: "invalid type"
+
+    - type: data
+      section: .rdata
+      offset: 0x320028
+      string: "invalid type, expected table"
+ 
+    - type: data
+      section: .rdata
+      offset: 0x173D1C
+      string: "View"
 
     # This patch adds support for loading the 'LUMP_PAKFILE' lump as a discrete file.
     # The function originally loaded the BSP, and stored the header in a local variable.
