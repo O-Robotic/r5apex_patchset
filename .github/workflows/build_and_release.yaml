@@ -33,7 +33,7 @@ jobs:
 
       - name: Build OOADump
         if: steps.cache-ooadump.outputs.cache-hit != 'true'
-        uses: ./.github/workflows/build_tools
+        uses: ./.github/actions/build_tools
         with:
           repo: O-Robotic/OOADump
           tag: ${{env.tag}}
@@ -79,7 +79,7 @@ jobs:
 
     - name: Build BinPatch
       if: steps.cache-binpatch.outputs.cache-hit != 'true'
-      uses: ./.github/workflows/build_tools
+      uses: ./.github/actions/build_tools
       with:
         repo: O-Robotic/BinPatch
         tag: ${{env.tag}}
