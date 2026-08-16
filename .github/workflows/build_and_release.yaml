@@ -119,7 +119,7 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           pattern: r5apex
-          merge_multiple: true
+          merge-multiple: true
           path: rel
 
       - name: Create Release
