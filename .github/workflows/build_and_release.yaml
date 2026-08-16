@@ -44,7 +44,7 @@ jobs:
         with:
           repo: O-Robotic/OOADump
           tag: ${{env.tag}}
-          clone_dir: ${{ github.workspace }}/ooadump
+          clone_dir: ${{ github.workspace }}/ooadump_src
           runtime_path: ${{ github.workspace }}
 
       - name: Save to cache
@@ -93,7 +93,7 @@ jobs:
       with:
         repo: O-Robotic/BinPatch
         tag: ${{env.tag}}
-        clone_dir: ${{ github.workspace }}/BinPatch
+        clone_dir: ${{ github.workspace }}/binpatch_src
         runtime_path: ${{ github.workspace }}
 
     - name: Save to cache
