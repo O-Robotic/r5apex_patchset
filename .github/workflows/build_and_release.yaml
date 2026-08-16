@@ -14,23 +14,38 @@ jobs:
   build_OOADump:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup CMake
-        uses: lukka/get-cmake@latest
+      - name: Get latest release tag
+        shell: bash
+        run:  |
+          tag=$(gh release view --repo O-Robotic/OOADump --json tagName -q .tagName)
+          if [ -z "$tag" ]; then
+            echo "Could not get latest release tag" >&2
+            exit 1
+          fi
+          echo "tag=$tag" >> $GITHUB_ENV
 
-      - name: Install Ninja
-        run: sudo apt-get update && sudo apt-get install -y ninja-build
-
-      - name: Checkout ooadump
-        uses: actions/checkout@v7
+      - name: Find release in cache
+        id: cache-ooadump
+        uses: actions/cache@v6
         with:
-          repository: 'O-Robotic/OOADump'
-          path: ooadump
-
-      - name: Configure OOADump
-        run: cmake -S ${{ github.workspace }}/ooadump -B ${{ github.workspace }}/ooadump/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${{ github.workspace }}
+          path: OOADump
+          key: ooadump-${{env.tag}}
 
       - name: Build OOADump
-        run: cmake --build ${{ github.workspace }}/ooadump/build --config Release --parallel
+        if: steps.cache-ooadump.outputs.cache-hit != 'true'
+        uses: ./.github/workflows/build_tools
+        with:
+          repo: O-Robotic/OOADump
+          tag: ${{env.tag}}
+          clone_dir: ${{ github.workspace }}/ooadump
+          runtime_path: ${{ github.workspace }}
+
+      - name: Save to cache
+        if: steps.cache-ooadump.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: OOADump
+          key: ooadump-${{env.tag}}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
@@ -44,23 +59,39 @@ jobs:
   build_BinPatch:
     runs-on: ubuntu-latest
     steps:
-    - name: Setup CMake
-      uses: lukka/get-cmake@latest
+    
+    - name: Get latest release tag
+      shell: bash
+      run:  |
+        tag=$(gh release view --repo O-Robotic/BinPatch --json tagName -q .tagName)
+        if [ -z "$tag" ]; then
+          echo "Could not get latest release tag" >&2
+          exit 1
+        fi
+        echo "tag=$tag" >> $GITHUB_ENV
 
-    - name: Install Ninja
-      run: sudo apt-get update && sudo apt-get install -y ninja-build
-
-    - name: Checkout BinPatch
-      uses: actions/checkout@v7
+    - name: Find release in cache
+      id: cache-binpatch
+      uses: actions/cache@v6
       with:
-        repository: 'O-Robotic/BinPatch'
-        path: binpatch
-
-    - name: Configure BinPatch
-      run: cmake -S ${{ github.workspace }}/binpatch -B ${{ github.workspace }}/binpatch/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${{ github.workspace }}
+        path: BinPatch
+        key: binpatch-${{env.tag}}
 
     - name: Build BinPatch
-      run: cmake --build ${{ github.workspace }}/binpatch/build --config Release --parallel
+      if: steps.cache-binpatch.outputs.cache-hit != 'true'
+      uses: ./.github/workflows/build_tools
+      with:
+        repo: O-Robotic/BinPatch
+        tag: ${{env.tag}}
+        clone_dir: ${{ github.workspace }}/BinPatch
+        runtime_path: ${{ github.workspace }}
+
+    - name: Save to cache
+      if: steps.cache-binpatch.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v6
+      with:
+        path: BinPatch
+        key: binpatch-${{env.tag}}
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v7

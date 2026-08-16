@@ -1,0 +1,36 @@
+name: Build Tool
+inputs:
+  repo:
+    required: true
+  
+  tag:
+    required: false
+    default: ''
+
+  clone_dir:
+    required: true
+
+  runtime_path:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Setup CMake
+      uses: lukka/get-cmake@latest
+
+    - name: Install Ninja
+      run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+    - name: Checkout
+      uses: actions/checkout@v7
+      with:
+        repository: ${{ inputs.repo }}
+        path: ${{ inputs.clone_dir }}
+        tag: ${{ inputs.tag }}
+
+    - name: Configure
+      run: cmake -S ${{ inputs.clone_dir }} -B ${{ inputs.clone_dir }}/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${{ inputs.runtime_path }}
+
+    - name: Build
+      run: cmake --build ${{ inputs.clone_dir }}/build --config Release --parallel
