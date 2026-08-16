@@ -89,15 +89,12 @@ jobs:
       - name: Decrypt Executable
         run: | 
           chmod +x OOADump
-          ./OOADump --outputfile r5apex.unpacked.exe r5apex.exe
-
-      - name: Create Output Dir
-        run: mkdir out
+          ./OOADump --outputfile out/r5apex.unpacked.exe r5apex.exe
 
       - name: Patch Executable
         run: |
           chmod +x BinPatch
-          ./BinPatch -input r5apex.unpacked.exe -patch r5apex.yaml -output out/r5apex.exe
+          ./BinPatch -input out/r5apex.unpacked.exe -patch r5apex.yaml -output out/r5apex.exe
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
