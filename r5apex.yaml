@@ -1561,13 +1561,6 @@ patches:
       patch: |
         and byte ptr [rdi+14h], 0FDh
 
-
-    #
-    # line 160, data patch not done yet
-    # line 161, data patch not done yet
-    #
-
-    # TODO: Allow inserting and shifting the old instructions forward
     - type: code
       segment: .text
       mode: replace
@@ -2800,7 +2793,7 @@ patches:
 
 #
 # CMaterialSystem::DrawStreamOverlay
-# Change store to 64bit from 32, why?
+# Change store to 64bit from 32
 #
 
     - type: code

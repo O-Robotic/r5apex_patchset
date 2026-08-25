@@ -1,0 +1,4206 @@
+imports:
+    - mode: add
+      module: loader.dll
+      entries:
+        - ordinal: 1
+
+    - mode: edit
+      module: GDI32.dll
+      remove: true
+
+    - mode: edit
+      module: GDI32.dll
+      remove: true
+    
+    - mode: edit
+      module: IMM32.dll
+      remove: true
+
+    - mode: edit
+      module: AVIFIL32.dll
+      remove: true
+
+    - mode: edit
+      module: d3d11.dll
+      remove: true
+
+    - mode: edit
+      module: D3DCOMPILER_43.dll
+      remove: true
+
+    - mode: edit
+      module: mileswin64.dll
+      remove: true
+
+    - mode: edit
+      module: binkawin64.dll
+      remove: true
+
+    - mode: edit
+      module: bink2w64.dll
+      remove: true
+
+exports:
+    clear: true
+    entries:
+      - op: add
+        name: LauncherMain
+        rva_sig:
+            section: .text
+            sig: 48 89 5C 24 ?? 48 89 7C 24 ?? 55 41 54 41 55 41 56 41 57 48 8D AC 24 ?? ?? ?? ?? 48 81 EC
+
+      - op: add
+        name: AmdPowerXpressRequestHighPerformance
+        rva: 0x171BB5C
+
+      - op: add
+        name: CreateGlobalMemAlloc
+        rva_sig:
+          section: .text
+          sig: 40 53 48 83 EC ?? BB ?? ?? ?? ?? 33 C0
+
+      - op: add
+        name: g_pMemAllocSingleton
+        rva: 0xD40B538
+
+      - op: add
+        name: g_ThreadMainThreadID
+        rva: 0x241E443C
+
+      - op: add
+        name: g_ThreadServerFrameThreadID
+        rva: 0x171BC84
+
+      - op: add
+        name: g_pCmdLine
+        rva: 0x1F07600
+
+
+
+
+patches:
+
+    #
+    # Set the sample rate and avg bitrate to 16khz
+    # 
+    - type: data
+      section: .data
+      offset: 0x8B0C
+      bytes: [0x80, 0x3E, 0x00, 0x00, 0x00, 0x7D, 0x00, 0x00] 
+
+    - type: data
+      section: .rdata
+      offset: 0x9CA26
+      string: "Only %i string tables allowed, can't create '%s'\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xA8BE7
+      string: "File '%s' size %zd is too large for buffer of size %zd.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xBD01A
+      string: "PERSISTENT DATADEF: Out of room allocating '%s'. %llu/%llu strings already allocated, %llu/%llu bytes already used.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xBD0BE
+      string: "Cannot define new struct '%s', already at limit of %llu structs.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xC7930
+      string: "%8zd/%8zd/%8zd kiB unusable/unfree/total GPU Streaming Texture memory\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xD5276
+      string: "%s failed for size %zu, type %u."
+
+    - type: data
+      section: .rdata
+      offset: 0x1A9396
+      string: "GetGamemodeVar: Not connected to a server"
+
+    - type: data
+      section: .rdata
+      offset: 0x1DA4DE
+      string: "Classname '%s' is too long (%zu of %zu chars) for this entry in '%s': %s\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x25188
+      string: "An unspecified error has occurred."
+
+    - type: data
+      section: .rdata
+      offset: 0x479A8
+      string: "Negative response in cache while server connect"
+
+    - type: data
+      section: .rdata
+      offset: 0x4BAF0
+      string: "SOCKS5 server authenticated user %s with GSS-API.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1E3268
+      string: "FIELD_INTERVAL\0FIELD_MODELINDEX"
+
+    - type: data
+      section: .rdata
+      offset: 0x84600
+      bytes: [0x77, 0x92, 0x47, 0x41, 0x01, 0x00, 0x00, 0x00]
+
+    - type: data
+      section: .rdata
+      offset: 0xA94B8
+      string: "language"
+
+    # Change the default value string for enable_debug_overlays to 0 instead of 1
+    - type: data
+      section: .data
+      offset: 0x216C0
+      bytes: [0x90, 0x47, 0x32, 0x41, 0x01]
+
+    # Spelling mistake in memtest recommendation error
+    - type: data
+      section: .rdata
+      offset: 0x4EDC1
+      nullterm: false
+      string: "hly than your BIOS"
+
+    - type: data
+      section: .rdata
+      offset: 0x8E078
+      string: "EnsureCapacity( %zd ) called for external buffer of size %zd.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x973C0
+      string: "LoadPlayerConfig: g_pFileSystem == NULL\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x98430
+      string: "udp/ip  : [%s]:%i os(%s) type(%s)\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x984D0
+      string: "# userid name uniqueid connected ping loss state rate\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x98508
+      string: " adr\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x98788
+      string: "changelevel %s\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x99050
+      string: "Set the sp text for the load screen. This is cleared to the default after each load."
+
+    - type: data
+      section: .rdata
+      offset: 0x9A488
+      string: "0: don't draw; 1: draw normal; 2: draw bones; 3: draw hulls"
+
+    - type: data
+      section: .rdata
+      offset: 0x9B738
+      string: "'max_teams' (%u) is too high (max: %d).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x9EF50
+      string: "Server is switching to playlist with max teams of '%llu' (was '%llu') and cannot reassign teams at this time"
+
+    - type: data
+      section: .rdata
+      offset: 0x9FCF8
+      string: "Draws the vgui panel hierarchy to the specified depth level."
+
+    - type: data
+      section: .rdata
+      offset: 0xA0400
+      string: "DataBlockFragment overflowed [%zu][%lu]"
+
+    - type: data
+      section: .rdata
+      offset: 0xA11C0
+      string: "Frame rate limiter. -1 indicates the use of desktop refresh. 0 is unlocked."
+
+    - type: data
+      section: .rdata
+      offset: 0xA1298
+      string: "Frame rate limiter when vsync is enabled."
+
+    - type: data
+      section: .rdata
+      offset: 0xA7460
+      string: "Sets the base layer animation for chroma hardware. gradient maps values 0-1 to colors."
+
+    - type: data
+      section: .rdata
+      offset: 0xA8188
+      string: "CL_TransitionEntityToSnapshot: Error creating entity %s(%i).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xA81C8
+      string: "CL_TransitionEntityToSnapshot: Invalid recv table for ent %d.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xa84C0
+      string: "Use the actual delta time for motion instead of a super complicated system based on the server frame rate."
+
+    - type: data
+      section: .rdata
+      offset: 0xA8C78
+      string: "File '%s' size %zd is too small to process.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xA8E70
+      string: "CL_RegisterResources: host_state.worldmodel/GetBaseLocalClient().GetModel( 1 ) == NULL\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xA8F20
+      string: "connectWithToken"
+    
+    - type: data
+      section: .rdata
+      offset: 0xAD648
+      string: "net_connectPacketWarningThreshold"
+
+    - type: data
+      section: .rdata
+      offset: 0xADDE0
+      string: "Received future spawn count %i in signon state msg %s when we thought we were on server count %i\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xAE098
+      string: "CL_ParsePacketEntities: buffer read overflow\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xB09A0
+      string: "ProcessUserCmds: Incorrect reading frame (check sending and receiving code for mismatches)!\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xB0A00
+      string: "ProcessUserCmds: Overflowed reading usercmd data (check sending and receiving code for mismatches)!\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xB1D38
+      string: "Player's account is already on the server.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xB1F98
+      string: "C2S_CONNECT desync.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xB2018
+      string: "Invalid challenge packet.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xB20E8
+      string: "%s overflowed reliable channel\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xB2AB8
+      string: "mp_huge_threshold"
+
+    - type: data
+      section: .rdata
+      offset: 0xB58F0
+      string: "CURL: not enough memory (realloc returned NULL) - tried to allocate %zu bytes\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xB58F0
+      string: "CURL: not enough memory (realloc returned NULL) - tried to allocate %zu bytes\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xB5F38
+      string: "TITANFALL2-PC-SERVER"
+
+    - type: data
+      section: .rdata
+      offset: 0xBC538
+      string: "%s: length %llu, defFileVersion %s"
+
+    - type: data
+      section: .rdata
+      offset: 0xBC650
+      string: "%s: team %llu"
+
+    - type: data
+      section: .rdata
+      offset: 0xBC7D8
+      string: "%s: needs decoder: %s, bytes %i"
+
+    - type: data
+      section: .rdata
+      offset: 0xBC828
+      string: "client should load their local sendtable file"
+
+    - type: data
+      section: .rdata
+      offset: 0xBCF80
+      string: "Hit PDATA_MAX_ENUM_ITEM_NAMES limit of %llu items."
+
+    - type: data
+      section: .rdata
+      offset: 0xBCFB8
+      string: "Hit PDATA_MAX_ITEMS_DEFS limit of %llu items."
+
+    - type: data
+      section: .rdata
+      offset: 0xBD1B8
+      string: "Cannot define new enum '%s', already at limit of %llu enums.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xBD880
+      string: "Datadef requires %llu bytes, max allowed by code is only %llu.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xBD930
+      string: "Hit limit of %llu base vars with line: %s\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xBDFC0
+      string: "PersistenceRecieveBaseline() error receiving string for item #%llu (\"%s\")."
+
+    - type: data
+      section: .rdata
+      offset: 0xBE2F8
+      string: "Controls the running of a low-pass filter to help remove DC."
+
+    - type: data
+      section: .rdata
+      offset: 0xBE338
+      string: "speex_use_preprocess"
+
+    - type: data
+      section: .rdata
+      offset: 0xBFCC4
+      string: "The prefetch is medium priority and persistent."
+
+    - type: data
+      section: .rdata
+      offset: 0xBFD63
+      string: "The prefetch is medium priority and non-persistent."
+    
+    - type: data
+      section: .rdata
+      offset: 0xC0CA8
+      string: "failed to read %zd bytes\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xC0E38
+      string: "%s%s%s%s fnumber=%d ofs=%ju crc=0x%x fcompsz=%llu fsz=%ju"
+
+    - type: data
+      section: .rdata
+      offset: 0xC40F0
+      string: "Mode 0 is total free memory(excluding garlic), 1 is small block heap, 2 is Client Script, 3 is UI Script"
+
+    - type: data
+      section: .rdata
+      offset: 0xC81D0
+      string: "%d linkedTextures loaded\n%d/%d mip levels loaded\n%zd kiB/%zd kiB loaded\nActive mode: '%s'(%d)\n\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xC82E8
+      string: "Resident pages (max page size %zd bytes):\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xC8480
+      string: " + '%s' (%i res/%i strm/%i total) "
+
+    - type: data
+      section: .rdata
+      offset: 0xC8528
+      string: "<no activePageState (page loading???)>\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xC9D68
+      string: "..\\cfg\\dxsupport.cfg"
+
+    - type: data
+      section: .rdata
+      offset: 0xCE430
+      string: "Allow post-processing when debug views are enabled."
+
+    - type: data
+      section: .rdata
+      offset: 0xCF1B0
+      string: "0 for no fade out on silhouette, 1 for fade out on silhouette"
+
+    - type: data
+      section: .rdata
+      offset: 0xD18B0
+      string: "Error reading pak file \"%s\" -- decompressed size %zu doesn't match expected value %zu\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xD2388
+      string: "Invalid escape character %c at %s."
+
+    - type: data
+      section: .rdata
+      offset: 0xD23B0
+      string: "Unicode escape is not four hex digits at %s."
+
+    - type: data
+      section: .rdata
+      offset: 0xD5248
+      string: "%s failed on span %p+%u, size %zu, type %u."
+
+    - type: data
+      section: .rdata
+      offset: 0xD52B0
+      string: "%p: %p+%08I64x (RSV%s )\n"
+
+    - type: data
+      section: .rdata
+      offset: 0xD5520
+      string: "Convar '%s' is flagged as both FCVAR_ARCHIVE and FCVAR_ARCHIVE_PLAYERPROFILE.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1040E0
+      string: "ArameMono"
+
+    - type: data
+      section: .rdata
+      offset: 0x110AF0
+      string: "qhull internal error (point_add): point p%d is out of bounds (%d)\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x110BD0
+      string: "qh_vertexneighbors: determining neighboring facets for each vertex\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x11A848
+      string: "Get the attachment id's right vector"
+    
+    - type: data
+      section: .rdata
+      offset: 0x11A870
+      string: "Get the attachment id's forward vector"
+
+    - type: data
+      section: .rdata
+      offset: 0x11A8B0
+      string: "Get the attachment id's up vector"
+
+    - type: data
+      section: .rdata
+      offset: 0x11A9A0
+      string: "Get the attachment id's origin vector on a viewmodel entity without the FOV adjustment"
+
+    - type: data
+      section: .rdata
+      offset: 0x11AB78
+      string: "Get the attachment id's origin vector"
+
+    - type: data
+      section: .rdata
+      offset: 0x11AC58
+      string: "Get the attachment id's angles as a p,y,r vector"
+
+    - type: data
+      section: .rdata
+      offset: 0x11B9F0
+      string: "Pause the current animation started by Anim_Play*(). Used by the animation previewer."
+
+    - type: data
+      section: .rdata
+      offset: 0x11FD70
+      string: "The position between the entity's eyes."
+
+    - type: data
+      section: .rdata
+      offset: 0x121E60
+      string: "Force entity to have shadows even if it isn't visible to the client.  Useful for making the thirdperson model cast a shadow while in first person."
+
+    - type: data
+      section: .rdata
+      offset: 0x123800
+      string: "Allows ent to have aimassist applied to them on non phased players while they are phased"
+
+    - type: data
+      section: .rdata
+      offset: 0x123950
+      string: "Get the named attachment id"
+
+    - type: data
+      section: .rdata
+      offset: 0x123B70
+      string: "Sets the direction the shot has to come from to pass the ent"
+
+    - type: data
+      section: .rdata
+      offset: 0x125650
+      string: "ent_repack_threshold"
+
+    - type: data
+      section: .rdata
+      offset: 0x1262F8
+      string: "UiData%llu"
+
+    - type: data
+      section: .rdata
+      offset: 0x130440
+      string: "Checks if grapple hook is deployed (not necessarily attached)."
+
+    - type: data
+      section: .rdata
+      offset: 0x130CB8
+      string: "Get a titan available for smart targeting type uses."
+
+    - type: data
+      section: .rdata
+      offset: 0x133730
+      string: "Failed to find model index for model \"%s\". Make sure it is precached.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x16D3C0
+      string: "Set the percentage of the distance that the light will falloff halfway"
+
+    - type: data
+      section: .rdata
+      offset: 0x16FE30
+      string: "How often a caption can repeat, unless overridden by norepeat. (or 0)"
+
+    - type: data
+      section: .rdata
+      offset: 0x16FED0
+      string: "How often a caption can repeat, unless overridden by norepeat. (timeshift only) (or 0)"
+
+    - type: data
+      section: .rdata
+      offset: 0x173B28
+      string: "r_setupBoneWorkerThreshold"
+
+    - type: data
+      section: .rdata
+      offset: 0x173CA0
+      string: "[%-5s Particle Limiter] active systems: %4d cur, %4d avg, %4d limit | active particles: %5d cur, %5d avg, %5d limit"
+
+    - type: data
+      section: .rdata
+      offset: 0x176E00
+      string: "The hitch/choke alerts will use this color."
+
+    - type: data
+      section: .rdata
+      offset: 0x1789E0
+      string: "Toggle Low Res Particle Debug Texture"
+
+    - type: data
+      section: .rdata
+      offset: 0x1796E8
+      string: "When disabled suppresses any update of refract texture."
+
+    - type: data
+      section: .rdata
+      offset: 0x17F768
+      string: "Change the draw group of a RUI instance"
+
+    - type: data
+      section: .rdata
+      offset: 0x1850D0
+      string: "Script_UserHasEAAccess: no engine pointer.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x189E10
+      string: "Returns mic status for a userid on the local players team (passing in uid as string)"
+
+    - type: data
+      section: .rdata
+      offset: 0x18ACA0
+      string: "indicates if you can issue an invite, if not return a reason."
+
+    - type: data
+      section: .rdata
+      offset: 0x19C0D0
+      string: "Enable IK height adjustment"
+
+    - type: data
+      section: .rdata
+      offset: 0x19C120
+      string: "Debugging for IK height adjustment"
+
+    - type: data
+      section: .rdata
+      offset: 0x19C248
+      string: "Test IK height adjustment with a sine wave"
+
+    - type: data
+      section: .rdata
+      offset: 0x19CC30
+      string: "Failed to create a new dynamic prop! Trying to spawn prop on model '%s' with sequence '%s'\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x19CC90
+      string: "Can't create anymore anim props. Trying to spawn prop '%s' on attachment named '%s' on model '%s' with sequence '%s'\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x19E800
+      string: "Attempted to use \"%s\" which has not been precached. Call %s( $\"%s\" ) during level load"
+
+    - type: data
+      section: .rdata
+      offset: 0x1A4980
+      string: "Minimum fraction of desired superjump height that is achieved, even if already moving quickly upwards"
+
+    - type: data
+      section: .rdata
+      offset: 0x1A5E10
+      string: "Beyond wallrun_sameWallDist, wall running is permitted at higher points with this slope"
+
+    - type: data
+      section: .rdata
+      offset: 0x1A6B08
+      string: "Eye height above ledge at which gun is re-enabled"
+
+    - type: data
+      section: .rdata
+      offset: 0x1AAF50
+      string: "Returns whether there are assets loaded from before the game was fully installed--i.e., we need to restart or reload rpaks."
+
+    - type: data
+      section: .rdata
+      offset: 0x1AB370
+      string: "Returns true if the game is partially installed. You can't start sp training if this is false."
+
+    - type: data
+      section: .rdata
+      offset: 0x1ABDC0
+      string: "Returns true if a different signed in user has age restriction to play multiplayer."
+
+    - type: data
+      section: .rdata
+      offset: 0x1ACBE0
+      string: "Call when entering the lobby ( int gamemodeId, int difficultyLevelId )"
+
+    - type: data
+      section: .rdata
+      offset: 0x1AD358
+      string: "Returns true if game is up-to-date in Origin."
+
+    - type: data
+      section: .rdata
+      offset: 0x1CC960
+      string: "PingTraceLine: Error can't use team %i. Values expected are between %i and %i\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1D0250
+      string: "easeIn + easeOut exceeded total movetime!"
+
+    - type: data
+      section: .rdata
+      offset: 0x1D18C0
+      string: "Retrieves an entity (or null) based off an encoded ehandle received from the server. Return null for lightweight entities"
+
+    - type: data
+      section: .rdata
+      offset: 0x1D38C0
+      string: "Days worth of seconds that will be added to the result of GetUnixTimestamp(). Server authoritative."
+
+    - type: data
+      section: .rdata
+      offset: 0x1D4070
+      string: "Too many elements for bodyGroupValues while setting Optic Appearance Override for \"%s\" for weapon \"%s\"."
+
+    - type: data
+      section: .rdata
+      offset: 0x1D5B20
+      string: "Map a value V from C to D. Linear interpolate between A and B mapped to C and D"
+
+    - type: data
+      section: .rdata
+      offset: 0x1E0858
+      string: "challenge_req"
+
+    - type: data
+      section: .rdata
+      offset: 0x1E18F0
+      string: "Hit limit of %llu mod assembly items.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1E1AD0
+      string: "\nParsing weapon info for: %s;\n Value for bodygroup index should be an int. Using 0 as default."
+
+    - type: data
+      section: .rdata
+      offset: 0x1E1B70
+      string: "\nParsing weapon info for: %s;\n Too many optic appearances. Max is %d."
+
+    - type: data
+      section: .rdata
+      offset: 0x1E22B8
+      string: "\nParsing weapon info for: %s;\n Too many UIDatas. Max is %d."
+
+    - type: data
+      section: .rdata
+      offset: 0x1FECF0
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': too many environments (max is currently %i).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FEEC0
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': too many %s controllers (max is currently %i).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF030
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': first environment must be named 'default'.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF0B0
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': two different environments with the same name '%s'.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF150
+      string: "Couldn't initialize sound.\nPlease make sure you have a sound playback device that is enabled and properly configured.\nFailed in: %s\nMiles output follows:\n%s\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF3F8
+      string: "Miles async failed read for '%s' offset %zu count %zu\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF430
+      string: "Miles async failed malloc for '%s' size %zu\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF460
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': duplicate emitter suffix '%s' in environment '%s'.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF4E0
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': Too many unique emitter suffixes, triggered by environment '%s'. (Limited globally to %i).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF4E0
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': Too many unique emitter suffixes, triggered by environment '%s'. (Limited globally to %i).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF6B0
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': couldn't find environment '%s' for 'inherit' in environment '%s' (must have be defined above).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF760
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': two different %s controllers with the same name '%s'.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FF8A0
+      string: "Error loading DSP environments from 'scripts/audio/environments.rson': too many emitter suffixes in environment '%s' (limit is currently %i).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FFC50
+      string: "Error loading Miles Sound Meter info from 'scripts/audio/soundmeter_busses.rson': Sound meter must provide 'bus' value (a string).\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x1FFDD0
+      string: "Error loading Miles Sound Meter info from 'scripts/audio/soundmeter_busses.rson': Too many sound meters -- code limit is %d.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x200278
+      string: "CSOM_Initialize"
+
+    - type: data
+      section: .rdata
+      offset: 0x201060
+      string: "Sets an additional offset XY for the cockpit panel. (-1, -1) to (1, 1)"
+
+    - type: data
+      section: .rdata
+      offset: 0x202960
+      string: "Given x-y, and left-right-top-bottom boundaries, clamp the X & Y. Returns an array with x and y values."
+
+    - type: data
+      section: .rdata
+      offset: 0x205190
+      string: "Out of room to register client function \"%s\" - Usage: %d/%d entries, %d/%d buffer."
+
+    - type: data
+      section: .rdata
+      offset: 0x209D90
+      string: "%s: Sound name was empty string!\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x209DC0
+      string: "%s: Sound name was empty string! Associated entity debugName is '%s'\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x212440
+      string: "Init spiraling missile"
+
+    - type: data
+      section: .rdata
+      offset: 0x222E18
+      string: "Clear the weapon charm entity for the current weapon."
+
+    - type: data
+      section: .rdata
+      offset: 0x2230D0
+      string: "Set the legendary weapon model index for this instance of the weapon. The weapon will use the default model from weapon info if a negative index is set."
+
+    - type: data
+      section: .rdata
+      offset: 0x23F738
+      string: "top() on an empty array"
+
+    - type: data
+      section: .rdata
+      offset: 0x23FAC0
+      string: "cannot wakeup an idle thread"
+
+    - type: data
+      section: .rdata
+      offset: 0x24D7C0
+      string: "Error loading Miles Bank list from 'scripts/audio/banks.rson': Too many banks -- code limit is %d.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x24D950
+      string: "Error loading Miles Bank list from 'scripts/audio/banks.rson': Only valid key is 'name', not '%s'.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x24DA20
+      string: "Error loading Miles Bank list from 'scripts/audio/banks.rson': Each bank must have exactly one name.\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x24F300
+      string: "GetWaypointClusters: No min cluster size provided"
+
+    - type: data
+      section: .rdata
+      offset: 0x24F7C0
+      string: "GetWaypointClusters: No ignore team provided"
+
+    - type: data
+      section: .rdata
+      offset: 0x250BB8
+      string: "Switches back to code control of yaw."
+
+    - type: data
+      section: .rdata
+      offset: 0x266850
+      string: "entity handle isn't an ai\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x2671C0
+      string: "NavMesh_RandomPositions expected 6 parameters"
+
+    - type: data
+      section: .rdata
+      offset: 0x267D40
+      string: "Gets a list of valid data slots for the node in given range (dataSlotsCount slots starting from dataSlotsStart)."
+
+    - type: data
+      section: .rdata
+      offset: 0x269DB0
+      string: "End the moment the animation begins to fade out rather than waiting until the cycle reaches 1"
+
+    - type: data
+      section: .rdata
+      offset: 0x26B018
+      string: "m_lastFootstepDamageOnGround"
+
+    - type: data
+      section: .rdata
+      offset: 0x26B7B0
+      string: "takes a normal weapon at a specific slot index"
+
+    - type: data
+      section: .rdata
+      offset: 0x26F9C0
+      string: "Get entity index of networked entity. Script error if the entity doesn't have an index."
+
+    - type: data
+      section: .rdata
+      offset: 0x2709D0
+      string: "Removes a usable type from the entity. Should not be called often as need to recompute partition mask everytime a new value is removed"
+
+    - type: data
+      section: .rdata
+      offset: 0x273090
+      string: "Displays the total bounding box for the given entity(s) in green.  Some entities will also display entity specific overlays.\n	Arguments:   	{entity_name} / {class_name} / no argument picks what player is looking at "
+
+    - type: data
+      section: .rdata
+      offset: 0x273580
+      string: "Displays the movement bounding box for the given entity(ies) in orange.  Some entities will also display entity specific overlays.\n	Arguments:   	{entity_name} / {class_name} / no argument picks what player is looking at "
+
+    - type: data
+      section: .rdata
+      offset: 0x273A20
+      string: "no such entity: \"%s\"\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x275080
+      string: "In seconds, how long a team must go without seeing an entity before they are no longer considered \"spotted\"."
+
+    - type: data
+      section: .rdata
+      offset: 0x27A670
+      string: "Controls whether the helicopter/rope integration is controlled by the server."
+
+    - type: data
+      section: .rdata
+      offset: 0x27D710
+      string: "Unable to allocate exception."
+
+    - type: data
+      section: .rdata
+      offset: 0x27F4A8
+      string: "Set whether or not to attack targets"
+
+    - type: data
+      section: .rdata
+      offset: 0x2D92A0
+      string: "Gets the player's preferred data center"
+
+    - type: data
+      section: .rdata
+      offset: 0x2D9D40
+      string: "Set override for player arms model to be used instead of the value from player settings. Set to \"\" to use the model from player settings."
+
+    - type: data
+      section: .rdata
+      offset: 0x2D9DD0
+      string: "Set override for player body model to be used instead of the value from player settings. Set to \"\" to use the model from player settings."
+    
+    - type: data
+      section: .rdata
+      offset: 0x2DD430
+      string: "Toggle prop debug mode. If on, props will show color-coded bounding boxes. Red means ignore all damage. White means respond physically to damage but never break. Green maps health in the range of 100 down to 1."
+
+    - type: data
+      section: .rdata
+      offset: 0x2E48D0
+      string: "Plays a sound on a given entity for all players in the vehicle. Unreliable (may be dropped if network traffic is too high)."
+
+    - type: data
+      section: .rdata
+      offset: 0x2E5330
+      string: "Plays particle effect on the vehicle for all players in the vehicle. Unreliable (may be dropped if network traffic is too high)."
+
+    - type: data
+      section: .rdata
+      offset: 0x2E9B50
+      string: "Check the given entity has no player children's attached. If so, it will raise a script error."
+
+    - type: data
+      section: .rdata
+      offset: 0x2EBEB0
+      string: "One player reports cheater to anti-cheat system. ReportCheater( string reportedGUID, string reportingGUID, string descr )"
+
+    - type: data
+      section: .rdata
+      offset: 0x2F16F0
+      string: "Get minimum goal radius for an AI's current AI setting"
+
+    - type: data
+      section: .rdata
+      offset: 0x2F2410
+      string: "Get the overridden maximum sight dist. It will be -1 if it has not been overridden"
+
+    - type: data
+      section: .rdata
+      offset: 0x2FA7F0
+      string: "   Sharing previously established connection\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x307FD8
+      string: "End lag compensation"
+
+    - type: data
+      section: .rdata
+      offset: 0x3089E0
+      string: "Field \"%s\" is a dynamic array, but settings header finder requested a specific array index (dynamic array lookup can only be done at runtime) (settings layout \"%s\")\n"
+
+    - type: data
+      section: .rdata
+      offset: 0x31FC20
+      string: "not enough parameters for the given format string"
+
+    - type: data
+      section: .rdata
+      offset: 0x31FF48
+      string: "invalid type"
+
+    - type: data
+      section: .rdata
+      offset: 0x320028
+      string: "invalid type, expected table"
+ 
+    - type: data
+      section: .rdata
+      offset: 0x173D1C
+      string: "View"
+
+    - type: data
+      section: .rdata
+      offset: 0x90A70
+      string: "vpk/server_%s.bsp"
+
+    - type: data
+      section: .rdata
+      offset: 0x97DF8
+      string: "vpk/server_mp_common.bsp"
+    
+    - type: data
+      section: .rdata
+      offset: 0x97E18
+      string: "vpk/server_frontend.bsp"
+
+    - type: data
+      section: .rdata
+      offset: 0xB7848
+      string: "vpk/server_mp_lobby"
+
+    - type: data
+      section: .rdata
+      offset: 0xB7860
+      string: "vpk/server_sp_"
+
+    - type: data
+      section: .rdata
+      offset: 0xB7870
+      string: "vpk/server_mp_"
+
+    # This patch assigns the model and anim cache pointers to NULL instead of 0xDEADFEEDDEADFEED,
+    # if the asset failed to load. The 0xDEADFEEDDEADFEED (DC_INVALID_HANDLE) assignment was most
+    # likely done to catch errors in the asset loading system, since the pointer test won't fail
+    # while the pointer is invalid, this cause a hard crash. We however don't want this as this
+    # would cause issues loading BSP's with missing assets (the SDK handles the errors properly
+    # and also logs what was failed to load).
+
+    - type: code
+      segment: .text
+      mode: replace
+    
+      sig: 48 B8 ED FE AD DE ED FE AD DE 49 89 07
+      
+      # NULL RAX instead of mov'ing '0xDEADFEEDDEADFEED' to cache ptr in 'Pak_UpdateModelAsset()'
+      patch: |
+        xor rax, rax
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 B8 ED FE AD DE ED FE AD DE 48 89 43 08
+
+      # NULL RAX instead of mov'ing '0xDEADFEEDDEADFEED' to cache ptr in 'Pak_UpdateAnimRigAsset()'
+      patch: |
+        xor rax, rax
+
+    # GetStudioHardwareForCombinedLODRange
+    # Expand null check on the modelCache pointer to include checking for 0xDEADFEEDDEADFEED error value
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 48 8B 40 ?? FF C3
+
+      patch: |
+        mov r10, 0DEADFEEDDEADFEEDh
+        cmp rax, r10
+        jz 1401E7B0Eh
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 74 ?? 40 38 35 ?? ?? ?? ?? 75 ?? 83 FB
+
+      # If we don't have an STBSP file, the field s_textureStreamMgr.hasResidentPages will be false. But if the texture
+      # stream manager is initialized and the stream mode is set to default, the code will force the stream mode to disabled.
+      # However, our engine has a working implementation of the GPU driven texture streaming system, and the correct thing
+      # to do here is to not force anything, since our SDK will enable the GPU driven texture streaming system if an STBSP
+      # file wasn't provided for the level. We turn the conditional jump to an unconditional jump here to skip this code.
+      patch: |
+        jmp 1403E0F74h
+
+#   Code Defects
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 80 4F ?? ?? 48 8B 05
+
+      # This fixes an engine bug where '-forceborder' did not force the border over the application window.
+      patch: |
+        and byte ptr [rdi+14h], 0FDh
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 05 6B 34 34 01
+
+      # This fixes a bug where the help string of a ConVar is set as the conVar name, which prevents you from
+      # setting it in the console due to the precense of space characters.
+      patch: |
+        lea rax, [141516578h]
+        mov qword ptr [142324538h], rax
+        lea rax, [141459F20h]
+        mov qword ptr [142324540h], rax
+        lea rax, [141324120h]
+        mov qword ptr [142324548h], rax
+        mov rax, [14D40E7C0h]
+        mov qword ptr [142324528h], rax
+        mov byte ptr [142324530h], 0
+        mov qword ptr [142324550h], 0
+        mov dword ptr [142324558h], 2002h
+        mov qword ptr [14D40E7C0h], rbx
+        jz no_accessor
+        mov rax, qword ptr [142324520h]
+        mov rcx, rbx
+        call qword ptr [rax+68h]
+        no_accessor:
+        lea rcx, [14124B700h]
+        add rsp, 20h
+        pop rbx
+        jmp 14117FCD8h
+
+
+    # TODO: Allow inserting and shifting the old instructions forward
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 05 6B DA 2F 01
+
+      # This fixes a bug where the help string of a ConVar is set as the conVar name, which prevents you from
+      # setting it in the console due to the precense of space characters.
+      patch: |
+        lea rax, [141516578h]
+        mov qword ptr [14238DDA8h], rax
+        lea rax, [141459F20h]
+        mov qword ptr [14238DDB0h], rax
+        lea rax, [141324120h]
+        mov qword ptr [14238DDB8h], rax
+        mov rax, qword ptr [14D40E7C0h]
+        mov qword ptr [14238DD98h], rax
+        mov byte ptr [14238DDA0h], 0
+        mov qword ptr [14238DDC0h], 0
+        mov dword ptr [14238DDC8h], 2002h
+        mov qword ptr [14D40E7C0h], rbx
+        jz no_accessor
+        mov rax, qword ptr [14238DD90h]
+        mov rcx, rbx
+        call qword ptr [rax+68h]
+        no_accessor:
+        lea rcx, [141272350h]
+        add rsp, 20h
+        pop rbx
+        jmp 14117FCD8h
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 0F 28 C1 48 8D 44 24
+
+      # In 'CInput::JoyStickApplyMovement' an extraneous 'fmin' clamp is performed on the frame time. BinDiff revealed that this was no longer performed on
+      # the 'Season 9.1 Genesis' executable. Further testing revealed that patching out just this clamp fixes the controller view stick problems when usercmd's
+      # get dropped in CL_Move.
+
+      # Nop 'minss   xmm0, xmm6' (extraneous clamp).
+
+      patch: |
+        movaps xmm0, xmm6
+        lea rax, [rsp+4Ch]
+        mov [rsp+30h], rax
+        nop
+        nop
+        nop
+        nop
+
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 0F 28 F0 48 8D 94 24
+
+      # Nop 'movaps  xmm6, xmm0' (extraneous move operation).
+      patch: |
+        nop
+        nop
+        nop
+
+
+# This fixes a bug where the control member 'CUtlBuffer::m_Get' is out of sync with the text buffer in 'CUtlBuffer::ParseToken'.
+# When we iterate over each character in the token buffer, we perform an equality test between the read len and buf len to prevent
+# a buffer overflow. Before this test happens, the read len always gets incremented by 1.
+# When the test fails, the code continues to where it checks if the control character is a break character (delimiter), if so,
+# the code breaks out of the loop, decrements the 'm_Get' member variable by 1, null-terminates the token buffer and returns the
+# read len. The issue is that read len has been incremented by 1 during the equality test, but the m_Get member variable by -1,
+# causing a desync. The next time 'ParseToken' is getting called, the control character will be off by one as 'm_Get' is off by one.
+# The fix is to just nop the decrement operation in assembled code (see commit '4969a84' for the source code fix).
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 43 ?? 48 3B 43 ?? 7E ?? 41 80 C8
+
+      # Nop 'movaps  xmm6, xmm0' (extraneous move operation).
+      patch: |
+        nop
+
+# ------------------------------------------------------------------------------------------------
+# This fixes a regression that was caused after a refactor on HUD data structures; the base sizes
+# are now written in a child structure, however, the function `Hud_SetScale` still accessed the old
+# root structure members. This regression broke the HUD overlays for weapons such as the smart pistol,
+# SRAM rocket launcher titan homing rockets, etc.. as well as the abstracted script function binding.
+# The `Hud_SetScaleX()` and `Hud_SetScaleY()` methods actually do access the correct child data members
+# confirming this function to be broken. The patch is simple; the child data structure is accessed
+# below our incorrect instructions for obtaining the base size, we just move the instruction above the
+# getters for the base size, and use that register instead with the updated offsets to obtain the right values.
+
+# *** Hud_SetScale ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 66 41 0F 6E 86 ?? ?? ?? ?? 66 41 0F 6E 8E
+
+      patch: |
+        mov rcx, qword ptr [r14+28h]
+        movd xmm0, dword ptr [rcx+144h]
+        movd xmm1, dword ptr [rcx+148h]
+
+# ------------------------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------------------------
+# This fixes a crash if we run out of tracing slots, the array is of a fixed size and can run
+# out of room in which the slot -1 is returned and the structure pointer is set to NULL. However,
+# the structure pointer is still dereferenced leading to the crash. For the patch, the nulling of
+# this register has been removed and the new space is used to transform the short jmp instruction
+# to a long jmp to return gadget (which for all these functions either sets the slot result (-1)
+# to the provided pointer, or into EAX).
+
+# *** sub_1408AD8D0 ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 33 D2 41 8B DA 8B CA
+
+      patch: |
+        jmp 1408ADA0Eh
+
+# *** sub_1405F2320 ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 33 C0 8B C8 EB 3D 8B C3 25 FF 1F 00 00 48 8D 0C C0 48 C1 E1 06 48 8D 05 AA 65 1F 24
+
+      patch: |
+        jmp 1405F2766h
+
+# *** sub_140608EE0 ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B CF EB ?? 8B C6
+
+      patch: |
+        jmp 140609370h
+
+# *** sub_14085D900 ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 75 ?? 33 C9 EB ?? 8B C6
+
+      patch: |
+        je 14085E22Ch
+
+# *** sub_1408AD720 ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 33 C9 41 8B DA
+
+      patch: |
+        jmp 1408AD8AEh
+
+# *** sub_140951D30 ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 33 D2 41 8B D9
+
+      patch: |
+        jmp 140951E8Bh
+
+# *** sub_140954C60 ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 49 8B CE EB ?? 8B C2 25 ?? ?? ?? ?? 48 8D 0C C0 48 C1 E1 ?? 49 03 C8
+
+      patch: |
+        jmp 140955EC9h
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 49 8B CE EB ?? 8B C2 25 ?? ?? ?? ?? 48 8D 0C C0 48 C1 E1 ?? 48 8D 05
+
+      patch: |
+        jmp 140955FD3h
+
+# *** sub_140A46ED0 ***
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 49 8B CC EB ?? 8B C6
+
+      patch: |
+        jmp 140A4722Eh
+
+
+# sub_1401FEC00
+# This CEngineClient function checks if origin should be enabled based on if -noorigin
+# It should only check for the paramater once and then the is cached 
+# However we never set the var for saying that the cached value has been set
+# This fixes it here and in all inlined calls
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 05 ?? ?? ?? ?? ?? 38 05 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? 48 8D 15 ?? ?? ?? ?? 48 0F 44 C8 45 33 C0 48 8B 01 FF 50 ?? 48 85 C0 0F 94 C0 84 C0
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 05 ?? ?? ?? ?? ?? 38 05 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? 48 8D 15 ?? ?? ?? ?? 48 0F 44 C8 45 33 C0 48 8B 01 FF 50 ?? 48 85 C0 0F 94 C2
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 05 ?? ?? ?? ?? ?? 38 05 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? 48 8D 15 ?? ?? ?? ?? 48 0F 44 C8 45 33 C0 48 8B 01 FF 50 ?? 48 85 C0 0F 94 C0 88 05 ?? ?? ?? ?? EB ?? 0F B6 05 ?? ?? ?? ?? 84 C0 74 ?? 48 83 C4
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 05 B2 AD 4A 29 00
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 05 02 AD 4A 29 00
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 05 22 AC 4A 29 00
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 05 A2 AA 4A 29 00
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 05 52 AE 4A 29 00
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 88 1D 7E AC 4A 29
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 88 1D ?? ?? ?? ?? 48 0F 44 CB 45 33 C0 48 8B 01 FF 50 ?? 48 85 C0 0F 94 C0 88 05
+
+      patch: |
+        mov byte ptr [1696A9B98h], 1
+
+#
+# DebugOverlay_AddTransformedBoxOverlay
+# Fix incorrect partial null pointer check
+#
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 74 1D C7 40 04 FF FF FF FF C7 40 18 FF FF FF FF 33 C0 41 89 41 08 49 89 41 10 41 89 01 EB 03 4C 8B C8
+
+      patch: |
+        jnz back
+        lea rcx, [160676D40h]
+        call 1412969B0h
+        jmp 140207AC7h
+        back:
+        mov dword ptr [rax+4], 0FFFFFFFFh
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4C 8B 05 A1 43 17 0B
+
+      patch: |
+        mov r8, qword ptr [14B37BE50h]
+        mov [r9+10h], r8
+        mov [14B37BE50h], r9
+        lea rcx, [160676D40h]
+
+
+#
+# DebugOverlay_AddLineOverlay
+# Fix incorrect partial null pointer check
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 45 33 C9 8B 07
+
+      patch: |
+        jmp 140207CB4h
+
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4C 8B 05 A7 41 17 0B
+
+      patch: |
+        mov r8, qword ptr [14B37BE50h]
+        mov [r9+10h], r8
+        mov [14B37BE50h], r9
+        lea rcx, [160676D40h]
+
+
+#
+# AddCustomMeshOverlay
+# Jump to function exit on overlay base allocation failure 
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 74 ?? C7 40 ?? ?? ?? ?? ?? C7 40 ?? ?? ?? ?? ?? 44 89 48
+
+      patch: |
+        jz 140207EEDh
+        nop
+        mov dword ptr [rax+4], 0FFFFFFFFh
+        mov dword ptr [rax+18h], 0FFFFFFFFh
+        mov [rax+8], r9d
+        mov [rax+10h], r9
+        mov dword ptr [rax], 3
+        lea eax, [rdi+rdi]
+
+#
+# AddCustomMeshOverlay
+# Use the 6th argument for the alpha channel
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 41 C7 80 ?? ?? ?? ?? ?? ?? ?? ?? E8 ?? ?? ?? ?? 80 7C 24
+
+      patch: |
+        mov eax, dword ptr [rsp+58h]
+        mov [r8+1830h], eax
+
+#
+# AddSphereOverlay
+# Jump to function exit on overlay base allocation failure
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 45 33 C9 8B 03 49 8B C9
+
+      patch: |
+        jmp 14020896Fh
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D ?? ?? ?? ?? 4D 89 41 ?? 4C 89 0D ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 48 8B 5C 24 ?? 0F 28 74 24
+
+      patch: |
+        mov [r9+10h], r8
+        mov qword ptr [14B37BE50h], r9
+        lea rcx, [160676D40h]
+
+#
+# AddSweptBoxOverlay
+# Jump to function exit on allocation failure
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 74 ?? C7 40 ?? ?? ?? ?? ?? C7 40 ?? ?? ?? ?? ?? C7 40 ?? ?? ?? ?? ?? 48 C7 40 ?? ?? ?? ?? ?? C7 00 ?? ?? ?? ?? EB ?? 45 33 C9 8B 06
+
+      patch: |
+        jz 140208AF4h
+        nop
+        mov dword ptr [rax+4], 0FFFFFFFFh
+        mov dword ptr [rax+18h], 0FFFFFFFFh
+        mov dword ptr [rax+8], 0
+        mov qword ptr [rax+10h], 0
+        mov dword ptr [rax], 6
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D 50 E2 46 20
+
+      patch: |
+        mov [r9+10h], r8
+        mov qword ptr [14B37BE50h], r9
+        lea rcx, [160676D40h]
+
+
+#
+# AddTriangleOverlay
+# Jump to function exit on allocation failure
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 74 ?? C7 40 ?? ?? ?? ?? ?? C7 40 ?? ?? ?? ?? ?? C7 40 ?? ?? ?? ?? ?? 48 C7 40 ?? ?? ?? ?? ?? C7 00 ?? ?? ?? ?? EB ?? 45 33 C9 41 8B 06
+
+      patch: |
+        jz 140208EFAh
+        nop
+        mov dword ptr [rax+4], 0FFFFFFFFh
+        mov dword ptr [rax+18h], 0FFFFFFFFh
+        mov dword ptr [rax+8], 0
+        mov qword ptr [rax+10h], 0
+        mov dword ptr [rax], 5
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D ?? ?? ?? ?? 4D 89 41 ?? 4C 89 0D ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 48 8B 5C 24 ?? 48 8B 74 24 ?? 48 8B 7C 24
+
+      patch: |
+        mov [r9+10h], r8
+        mov qword ptr [14B37BE50h], r9
+        lea rcx, [160676D40h]
+        
+
+#
+# sub_140209440
+# Jump to function exit on allocation failure
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 74 ?? C7 40 ?? ?? ?? ?? ?? C7 40 ?? ?? ?? ?? ?? 33 C0 41 89 41 ?? 49 89 41 ?? 49 89 41
+
+      patch: |
+        jz 14020958Fh
+        nop
+        mov dword ptr [rax+4], 0FFFFFFFFh
+        mov dword ptr [rax+18h], 0FFFFFFFFh
+        xor eax, eax
+        mov [r9+8], eax
+        mov [r9+10h], rax
+        mov [r9+50h], rax
+        mov dword ptr [r9], 7
+
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D B5 D7 46 20
+
+      patch: |
+        mov [r9+10h], r8
+        mov qword ptr [14B37BE50h], r9
+        lea rcx, [160676D40h]
+
+#
+# CFmtStr256
+# Fix incorrect buffer size, it is currently 255 but should be 256 to match the size of the buffer
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: BA ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 C7 C0 ?? ?? ?? ?? 48 FF C0 41 80 7C 06
+
+      patch: |
+        mov edx, 100h
+
+#
+# CFmtStr2048
+# Fix incorrect buffer size, it is currently 2047 but should be 2048 to match the size of the buffer
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: BA ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 C7 C0 ?? ?? ?? ?? 48 FF C0 80 7C 06
+
+      patch: |
+        mov edx, 800h
+
+#
+# CNetworkStringTableContainer::CreateStringTable
+# String pointer to "Only %i string tables allowed, can't create'%s'" has been moved
+# New location is now 0x141332A26
+#
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D ?? ?? ?? ?? BA ?? ?? ?? ?? E8 ?? ?? ?? ?? 33 C0 E9
+
+      patch: |
+        lea rcx, [141332A26h]
+
+
+#
+# NET_Config
+# CNetAdr::ToString should be called with bOnlyBase true we dont want the port in the convar
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 33 D2 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? 48 8B D0
+
+      patch: |
+        mov dl, 1
+
+#
+# StartPlaylist
+# If a game is running (m_bActiveGame == true) then we should use changelevel instead of map when starting a playlist
+#
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+      jump_back: true
+      byte_restore_pos: leading
+
+      sig: 48 8D 0D 8D D7 0A 01
+
+      patch: |
+        cmp byte ptr [141736384h], 0
+        jz 140279EBBh
+        lea rcx, [14132E788h]
+
+#
+# sub_14027E0C0
+# Fix early return on inlined overlay box
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 45 33 C9 0F 28 45
+
+      patch: |
+        jmp 14027E4A0h
+
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D ?? ?? ?? ?? 4D 89 41 ?? 4C 89 0D ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 4C 8D 0D
+
+      patch: |
+        mov [r9+10h], r8
+        mov qword ptr [14B37BE50h], r9
+        lea rcx, [160676D40h]
+
+
+#
+# LoadLocalSendtableFile
+# String pointer to "File '%s' size %d is too large for buffer of size %d.\n" has been moved
+# New location is now 0x14133EBE7
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D ?? ?? ?? ?? EB ?? 8B 44 24
+
+      patch: |
+        lea rcx, [14133EBE7h]
+
+#
+# box_command_completion
+# Jump to function exit on allocation failure
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 74 ?? C7 40 ?? ?? ?? ?? ?? C7 40 ?? ?? ?? ?? ?? 44 89 68
+
+      patch: |
+        jz 1402C0959h
+        nop
+        mov dword ptr [rax+4], 0FFFFFFFFh
+        mov dword ptr [rax+18h], 0FFFFFFFFh
+        mov dword ptr [rax+8], r13d
+        mov qword ptr [rax+10h], r13
+        mov dword ptr [rax], r13d
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D ?? ?? ?? ?? 4D 89 41 ?? 4C 89 0D ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 4C 8B 6C 24
+
+      patch: |
+        mov [r9+10h], r8
+        mov qword ptr [14B37BE50h], r9
+        lea rcx, [160676D40h]
+
+#
+# PdefStoreStringInStringBuffer
+# String pointer to "PERSISTENT DATADEF: Out of room allocating '%s'. %d/%d strings already allocated, %d/%d bytes already used.\n" has been moved
+# New location is 0x14135301A
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D ?? ?? ?? ?? 48 8B D6 E8 ?? ?? ?? ?? 33 C0 48 8B 5C 24
+
+      patch: |
+        lea rcx, [14135301Ah]
+
+#
+# PersistenceParseStructsAndEnums
+# String pointer to "Cannot define new struct '%s', already at limit of %d structs.\n" has been moved
+# New location is 0x1413530BE
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 32 C0 49 C7 07 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 43
+
+      patch: |
+        lea rcx, [1413530BEh]
+
+#
+# Sys_VirtualSimple_Alloc
+# String pointer to "%s failed for size %u, type %d." has been moved
+# New location is 0x14136B276
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 15 ?? ?? ?? ?? 48 8D 4C 24 ?? E8 ?? ?? ?? ?? 48 39 1D ?? ?? ?? ?? 75 ?? 48 8D 54 24 ?? 48 8B CF E8 ?? ?? ?? ?? 48 8B C3 48 8B 9C 24
+
+      patch: |
+        lea rdx, [14136B276h]
+
+#
+# RSON_LoadFromBuffer (inlined Sys_VirtualSpan_Create)
+# String pointer to "%s failed for size %u, type %d." has been moved
+# New location is 0x14136B276
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 15 E5 41 F2 00
+
+      patch: |
+        lea rdx, [14136B276h]
+
+#
+# Sys_VirtualSpan_Create
+# String pointer to "%s failed for size %u, type %d." has been moved
+# New location is 0x14136B276
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 15 C4 BA F0 00
+
+      patch: |
+        lea rdx, [14136B276h]
+
+#
+# Sys_VirtualSpan_CreateCommited
+# String pointer to "%s failed for size %u, type %d." has been moved
+# New location is 0x14136B276
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 15 C4 B4 F0 00
+
+      patch: |
+        lea rdx, [14136B276h]
+
+#
+# sub_1404663D0 (inlined Sys_VirtualSpan_Create)
+# String pointer to "%s failed for size %u, type %d." has been moved
+# New location is 0x14136B276
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 15 69 4E F0 00
+
+      patch: |
+        lea rdx, [14136B276h]
+
+#
+# Sys_VirtualSpan_Commit
+# String pointer to "%s failed for size %u, type %d." has been moved
+# New location is 0x14136B276
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 15 AE 4D F0 00
+
+      patch: |
+        lea rdx, [14136B276h]
+
+#
+# ConVar::InternalSetStringValue
+# Use "" string pointer instead of nullptr if a nullptr is passed as the string arg 
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B D6 48 8B CB 48 0F 45 FE
+
+      patch: |
+        cmovnz rdi, rsi
+        mov rdx, rdi
+        mov rcx, rbx
+        call 14046FF90h
+        test al, al
+        jnz 14047015Dh
+        mov rcx, rdi
+
+
+#
+# Client_GetGamemodeVarOrUseValue native func
+# String pointer to "__FUNCTION__: Not connected to a server" has been moved
+# New location is 0x14143F396
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D 2D 3A C1 00
+
+      patch: |
+        lea rcx, [14143F396h]
+
+
+#
+# sub_1408E1150 ( aim assist config read )
+# String pointer to "Classname '%s' is too long (%d of %d chars) for this entry in '%s': %s\n" has been moved
+# New location is 0x1414704DE
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D 74 ED B8 00
+
+      patch: |
+        lea rcx, [1414704DEh]
+
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 0D B4 E4 7F 00
+
+      patch: |
+        lea rcx, [1414704DEh]
+
+
+#
+# set_command_completion
+# Drop useless setClassVarServer command
+#
+#
+#    - type: code
+#      segment: .text
+#      mode: replace
+#
+#      sig: 8B 47 04 49 8B CF 83 F8 02
+#
+#      patch: |
+#        jmp 14086BC0Eh
+
+
+
+#
+# WinMain
+# Remove calls to CheckCPU and InitExceptionFilter
+# These are done in the SDK
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: E8 ?? ?? ?? ?? E8 ?? ?? ?? ?? 44 8B CB
+
+      patch: |
+        nop
+        nop
+        nop
+        nop
+        nop
+
+
+#
+# CPackedStore::GetFileHandle
+# Deinline Filesystem ops, call FS_OpenAsyncFile instead
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 4C 24 ?? 48 89 44 24 ?? 48 03 FE
+
+      patch: |
+        add rdi, rsi
+        mov [rdi+350h], rax
+        lea rcx, [rsp+0x40]
+        lea rdx, [rax+4]
+        mov r8, rax
+        call 140439300h
+        mov r14d, eax
+        jmp 140395B57h
+
+
+#
+# CMaterialSystem::DrawStreamOverlay
+# Change store to 64bit from 32
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 44 89 44 24 ?? 4C 8D 05 ?? ?? ?? ?? 48 8D 0C 02
+
+      patch: |
+        mov qword ptr [rsp+28h], r8
+
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 89 4C 24 ?? 48 8D 4C 24 ?? 4C 8D 0C 02
+
+      patch: |
+        mov qword ptr [rsp+20h], rcx
+        lea rcx, [rsp+50h]
+
+#
+# StreamDB_Init
+# Deinline file system open
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 4C 89 7C 24 ?? 45 33 C9 C7 44 24
+
+      patch: |
+        mov edx, 3
+        xor r8, r8
+        call 140439300h
+        mov dword ptr [1635A7698h], eax
+        cmp eax, 0FFFFFFFFh
+        jz 1403E96E0h
+        mov ebx, eax
+        lea r12, [167215200h]
+        jmp 1403E8E59h
+
+#
+# ColorCorrection_LoadAsync
+# Deinline file system open
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 4D ?? C7 44 24 ?? ?? ?? ?? ?? BA
+
+      patch: |
+        mov qword ptr [rsp+2a0h],r15
+        lea r8, [rsp+20h]
+        lea edx, [r9d+3]
+        lea rcx, [rbp+50h]
+        call 140439300h
+        cmp eax, 0FFFFFFFFh
+        jz 1405AAD8Eh
+        mov r15d, eax
+        mov eax, 1
+        mov dword ptr [rsp+44h], r15d
+        mov r13, qword ptr [rsp+20h]
+        mov edx, 23188h
+        cmp r13, rdx
+        jz 1405AAA86h
+        jmp 1405AAA1Dh
+
+
+#
+# TextureStreamMgr_GetStreamOverlay
+# Write qwords instead of dwords
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 44 89 54 24 ?? 44 89 4C 24 ?? 44 8B 0D
+
+      patch: |
+        mov qword ptr [rsp+0x38], r10
+        mov qword ptr [rsp+0x30], r9
+
+#
+#  Pak_ProcessAssets
+#  Jump straight into some streaming func instead, idek
+#
+#
+#
+#    - type: code
+#      segment: .text
+#      mode: replace
+#
+#      sig: 55 56 57 41 54 41 55 48 83 EC ?? 48 8B 59
+#
+#      patch: |
+#        nop
+#        nop
+#        nop
+#        mov eax, [rbx+1D0h]
+#        neg eax
+#        sbb ecx, ecx
+#        and ecx, 5
+#        call 1403F4F80h
+#        jmp 14075F63Fh
+
+
+#
+# Pak_StartLoading
+# Allow 
+#
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 75 ?? 4C 8D 84 24 ?? ?? ?? ?? B9
+
+      patch: |
+        jmp 140440490h 
+
+
+#
+# LauncherMain
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: B9 ?? ?? ?? ?? 48 8D 05 ?? ?? ?? ?? 48 89 05 ?? ?? ?? ?? 48 8D 05
+
+      patch: |
+        mov ecx, 0
+
+#
+# sub_14075F460
+# Not sure
+#
+
+#    - type: code
+#      segment: .text
+#      mode: insert
+#
+#      keep_stolen: false
+#      jump_back: true
+#      byte_restore_pos: trailing
+#
+#      sig: 33 C9 E8 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? 48 8B 01 FF 90 ?? ?? ?? ?? 83 BB
+#
+#      patch: |
+#        mov eax, [rbx+1D0h]
+#        neg eax
+#        sbb ecx, ecx
+#        and ecx, 5
+#        call 1403F4F80h
+
+
+#
+# sub_1403F4D10
+# 
+#
+#
+#
+#    - type: code
+#      segment: .text
+#      mode: insert
+#
+#      keep_stolen: false
+#      jump_back: false
+#      byte_restore_pos: trailing
+#
+#      sig: 48 83 C4 40 5F 48 FF 60 78 CC CC CC CC CC CC CC CC CC CC CC CC CC
+#
+#      patch: |
+#        call qword ptr [rax+78h]
+#        mov ecx, dword ptr [1635A7A48h]
+#        mov eax, 0AAAAAAABh
+#        mov rbx, qword ptr [rsp+50h]
+#        inc ecx
+#        mul ecx
+#        mov dword ptr [1635A7A4Ch], 0 
+#        shr edx, 1
+#        lea eax, [rdx+rdx*2]
+#        sub ecx, eax
+#        mov dword ptr [1635A7A48h], ecx
+#        add rsp, 40h
+#        pop rdi
+#        ret
+
+
+#
+# sub_1405B9F40
+#
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 81 78 ?? ?? ?? ?? ?? 48 89 05
+
+      patch: |
+        cmp qword ptr [rax+10h], 200h
+        mov qword ptr [14D40B2C0h], rax
+        jbe 1405B9FBEh
+        mov r9d, 200h
+
+
+#
+# sub_1405F2320
+# Jump out completely if we couldnt get a trace slot
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 33 C0 8B C8 EB
+
+      patch: |
+        jmp 1405F252Dh
+
+
+#
+# sub_1408AD720
+# Jump out completely if we couldnt get a trace slot
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 44 8B C1 EB ?? 8B C3
+
+      patch: |
+        nop
+        nop
+        nop
+        nop
+        nop
+
+#
+# sub_1408AD8D0
+# Jump out completely if we couldnt get a trace slot
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 8B CA EB 3D 8B C3 25 FF 1F 00 00 48 8D 0C C0 48 C1 E1 06 48 8D 05 F9 B2 F3 23
+
+      patch: |
+        nop
+        nop
+        nop
+        nop
+
+
+#
+# sub_140951D30
+# Jump out completely if we couldnt get a trace slot
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 8B CA EB 3D 8B C3 25 FF 1F 00 00 48 8D 0C C0 48 C1 E1 06 48 8D 05 94 6E E9 23
+
+      patch: |
+        nop
+        nop
+        nop
+        nop
+
+
+#
+# sub_140622D70
+# Enable depth testing on box overlay
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 44 24 ?? ?? 48 8D 15 ?? ?? ?? ?? 44 89 64 24
+
+      patch: |
+        mov byte ptr [rsp+40h], 0
+
+#
+# sub_140622D70
+# Enable depth testing on box overlay
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C6 44 24 ?? ?? F3 0F 11 45 ?? F3 0F 10 45
+
+      patch: |
+        mov byte ptr [rsp+40h], 0
+
+#
+# sub_140735D40
+# Reduce alpha channel for AddBoxOverlay
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: C7 44 24 ?? ?? ?? ?? ?? C7 44 24 ?? ?? ?? ?? ?? C7 44 24 ?? ?? ?? ?? ?? C7 44 24 ?? ?? ?? ?? ?? FF 50 ?? 48 8B 05
+
+      patch: |
+        mov dword ptr [rsp+38h], 10h
+
+
+#
+# CSOM_Shutdown
+# Change address of voicebus miles data
+#
+# Buffers were shifted because of a different sample rate being used with a miles upgrade
+#
+#    - type: code
+#      segment: .text
+#      mode: replace
+#
+#      sig: 48 8D 1D BC E2 A7 28
+#
+#      patch: |
+#        lea rbx, [1693D24B8h]
+
+#
+# CSOM_Initialize
+# Increase voice comm bus miles event count
+#
+
+#    - type: code
+#      segment: .text
+#      mode: replace
+#
+#      sig: 48 C7 05 ?? ?? ?? ?? ?? ?? ?? ?? C6 05 ?? ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B 1D
+#
+#      patch: |
+#        mov qword ptr [14D4DF250h], 0Ch
+#
+#
+##
+## CSOM_Initialize
+## Change address of voicebus miles data
+##
+#
+#    - type: code
+#      segment: .text
+#      mode: replace
+#
+#      sig: 48 8D 1D ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? 48 8D 3D
+#
+#      patch: |
+#        lea rbx, [1693D24B8h]
+#        mov rcx, qword ptr [1655B96F0h]
+#        lea rdi, [1693D24A4h]
+#
+#
+##
+## CSOM_Initialize
+## Set correct voice bus sample rate for upgraded miles project
+##
+#
+#    - type: code
+#      segment: .text
+#      mode: replace
+#
+#      sig: 41 B9 ?? ?? ?? ?? 8B C6
+#
+#      patch: |
+#        mov r9d, 3E80h
+#        mov eax, esi
+#        xor r8d, r8d
+#        imul rdx, rax, 0FA20h
+#
+#    - type: code
+#      segment: .text
+#      mode: replace
+#
+#      sig: 48 81 C7 ?? ?? ?? ?? 48 81 C3 ?? ?? ?? ?? 83 FE
+#
+#      patch: |
+#        add rdi, 0FA20h
+#        add rbx, 0FA20h
+#
+#    - type: code
+#      segment: .text
+#      mode: replace
+#
+#      sig: 48 B8 ?? ?? ?? ?? ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? 4C 2B C1
+#
+#      patch: |
+#        mov rax, 603538ACF83226Bh
+#        lea rcx, [1693C2AA0h]
+#        sub r8, rcx
+#        mul r8
+#        mov rax, 20C49BA5E353F7CFh
+#        shr rdx, 0Fh
+#        imul rbx, rdx, 0FA20h
+
+#
+# sub_1409AFF80
+#
+#
+#
+#    - type: code
+#      segment: .text
+#      mode: replace
+#
+#      sig: C7 84 93 ?? ?? ?? ?? ?? ?? ?? ?? 48 63 BB
+#
+#      patch: |
+#        mov dword ptr [rbx+rdx*4+0FA00h], 0
+#        movsxd rdi, dword ptr [rbx+0FA10h]
+#        call [1412971F0h]
+#        cmp eax, 2
+#        jnz 1409B0034h
+#        cmp dword ptr [rbx+rdi*4+0FA00h], 0
+#        mov rcx, rdi
+#        jbe 1409B0034h
+#        mov eax, [rbx+0FA10h]
+#        imul rdx, rcx, 3E80h
+#        inc eax
+#        mov rcx, rsi
+#        and eax, 3
+#        add rdx, rbx
+#        mov [rbx+0FA10h], eax
+#        mov r8d, [rbx+rdi*4+0FA00h]
+#
+##
+## sub_1409B0050
+##
+##
+#
+#
+#    - type: code
+#      segment: .text
+#      mode: replace
+#
+#      sig: 48 69 F8 ?? ?? ?? ?? 48 8B 05
+#
+#      patch: |
+#        imul rdi, rax, 0FA20h
+#
+#
+#    - type: code
+#      segment: .text
+#      mode: replace
+#
+#      sig: 46 0F B6 84 27
+#
+#      patch: |
+#        movzx r8d, byte ptr [rdi+r12+0FA14h]
+#        lea rdx, [r12+0FA00h]
+#
+#    - type: code
+#      segment: .text
+#      mode: replace
+#
+#      sig: 42 C6 84 27 ?? ?? ?? ?? ?? EB
+#
+#      patch: |
+#        mov byte ptr [rdi+r12+0FA14h], 0
+#        jmp label_1
+#        mov eax, dword ptr [rdi+r12+0FA04h]
+#        lea ecx, [r11+r11]
+#        add eax, dword ptr [rdi+r12+0FA08h]
+#        add eax, dword ptr [rdi+r12+0FA0Ch]
+#        add eax, [rdx]
+#        add ecx, eax
+#        cmp ecx, r9d
+#        jle label_2
+#        mov eax, dword ptr [rdi+r12+0FA10h]
+#        mov dword ptr [r15+rax*4+0FA00h], 0
+#        mov byte ptr [rdi+r12+0FA14h], 1
+#        jmp 1409B0272h
+#        label_2:
+#        test r8b, r8b
+#        jnz 1409B0272h
+#        label_1:
+#        cmp rbx, 3E80h
+#        ja 1409B0272h
+#        mov ecx, dword ptr [rdi+r12+0FA04h]
+#        add ecx, dword ptr [rdi+r12+0FA08h]
+#        add ecx, dword ptr [rdi+r12+0FA0Ch]
+#        mov rax, qword ptr [142336538h]
+#        add ecx, dword ptr [rdi+r12+0FA00h]
+#
+#    - type: code
+#      segment: .text
+#      mode: replace
+#
+#      sig: 42 8B 8C 27 ?? ?? ?? ?? 48 8D B1
+#
+#      patch: |
+#        mov ecx, [rdi+r12+0FA10h]
+#        lea rsi, [rcx+3E80h]
+#        mov edx, [r15+rsi*4]
+#        lea rax, [rdx+rbx]
+#        cmp rax, 3E80h
+#
+#    - type: code
+#      segment: .text
+#      mode: replace
+#
+#      sig: 42 8B 8C 27 ?? ?? ?? ?? 48 8D B1
+#
+#      patch: |
+#        mov ecx, [rdi+r12+0FA10h]
+#        lea rsi, [rcx+3E80h]
+#        mov edx, [r15+rsi*4]
+#        lea rax, [rdx+rbx]
+#        cmp rax, 3E80h
+#        jbe label_1
+#        mov dword ptr [r15+rsi*4], 0
+#        jmp 1409B026Ah
+#        label_1:
+#        mov qword ptr [rsp+0AC98h], r14
+#        mov r8, rbx
+#        imul r14, rcx, 3E80h
+#        lea r14, [r14+rdx]
+#        mov rdx, rbp
+#        add rcx, r15
+#        call 14119E100h
+#        add [r15+rsi*4], ebx
+#        mov rcx, [rdi+r12+0FA18h]
+#        call 1412971F0h
+#        cmp eax, 3
+#        jnb 1409B0262h
+#        mov rcx, [rdi+r12+0FA18h]
+#        call 1412971F0h
+#        cmp eax, 4
+#        jnb 1409B0262h
+#        mov eax, [rdi+r12+0FA10h]
+#        lea rdx, [r14+r15]
+#        mov rcx, [rdi+r12+0FA18h]
+#        inc eax
+#        and eax, 3
+#        mov [rdi+r12+0FA10h], eax
+#
+
+#
+# sub_140AFC030
+# Increase allocation size by 8 bytes
+#
+#
+#    - type: code
+#      segment: .text
+#      mode: replace
+#
+#      sig: BA ?? ?? ?? ?? 48 8B C8 41 FF 50 ?? 48 85 C0 74 ?? 48 8D 48 ?? 48 83 E1 ?? 48 89 41 ?? E8
+#
+#      patch: |
+#        mov edx, 1DFh
+
+
+#
+# sub_140B95A40
+# Fix incorrect duration value passed to AddSweptBoxOverlay
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: F3 44 0F 11 74 24 ?? 48 03 D0
+
+      patch: |
+        movss dword ptr [rsp+58h], xmm14
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: F3 44 0F 11 74 24 ?? 4C 03 C0
+
+      patch: |
+        movss dword ptr [rsp+58h], xmm14
+
+#
+# cast_hull_command_completion
+# fix incorrect duration passed to AddSweptBoxOverlay
+#
+#
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: false
+      byte_restore_pos: trailing
+
+      sig: F3 0F 11 74 24 ?? 4C 8D 4D
+
+      patch: |
+        lea r9, [rbp-60h]
+        lea r8, [rbp]
+        movss dword ptr [rsp+58h], xmm6
+        mov byte ptr [rsp+38h], bl
+        mov dword ptr [rsp+48h], 0FFh
+        mov dword ptr [rsp+40h], 0FFh
+        mov dword ptr [rsp+38h], ebx
+        mov dword ptr [rsp+30h], ebx
+        mov qword ptr [rsp+28h], rdx
+        lea rdx, [rbp-70h]
+        mov qword ptr [rsp+20h], rdx
+        lea rdx,[rbp-50h]
+        call qword ptr [rax+60h]
+        jmp 140D30021h
+
+#
+# CServerGameDLL::DLLInit
+# Reduce numTextures max to 512 from 513
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 81 7F
+
+      patch: |
+        cmp qword ptr [rdi+10h], 200h
+        mov qword ptr [14D4EE8A8h], rdi
+        jbe 140D55978h
+        mov r9d, 200h
+
+#
+# Pak_GetValidAssetGUID
+# Dont generate the guid twice for no reason
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 5C 24 ?? 57 48 83 EC ?? F6 C1 ?? 48 8D 05
+
+      patch: |
+        mov qword ptr [rsp+8h], rbx
+        push rdi
+        sub rsp, 20h
+        test cl, 3
+        lea rax, [14046CD70h]
+        lea rbx, [14046CD60h]
+        cmovnz rbx, rax
+        call rbx
+        test rax, rax
+        jz retn_0
+        mov rcx, rax
+        mov rdi, rcx
+        call 140442170h
+        test rax, rax
+        jz retn_0
+        mov rax, rdi
+        mov rbx, qword ptr [rsp+30h]
+        add rsp, 20h
+        pop rdi
+        ret
+        retn_0:
+        xor eax, eax
+        mov rbx, qword ptr [rsp+30h]
+        add rsp, 20h
+        pop rdi
+        ret
+
+#
+# FireWeaponBolt 
+# Add null check for return of CreateWeaponBolt
+#
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 8B 4D ?? 48 8B F0
+
+      patch: |
+        test rax, rax
+        jz 141014AD3h
+
+
+#
+# Fix null deref in CreatePlayerWaypoint
+#
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 39 B8 ?? ?? ?? ?? 74 ?? 0F B7 40 ?? 66 83 F8 ?? 74 ?? 48 8B 15
+
+      patch: |
+        test rbx, rbx
+        jz 140C0B1E0h
+        cmp [rax+0B10h], edi
+
+
+#
+# Fix null deref in CreatePlayerPOI
+#
+
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 44 8B 8D ?? ?? ?? ?? 48 8B F8
+
+      patch: |
+        test rax, rax
+        jz 140C0B83Fh
+
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 48 8B C4 48 89 58 ?? 48 89 78 ?? 55 48 8D 68 ?? 48 81 EC ?? ?? ?? ?? 48 8B FA
+
+      patch: |
+        cmp qword ptr [rdx+10h], 0
+        jz 140CE57A3h
+
+
+#
+# SQLexer::Init
+# Expand initial table size to better match expected size of 70+
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 41 8D 56 ?? E8 ?? ?? ?? ?? 48 89 47
+
+      patch: |
+        lea edx, [r14+53h]
+
+
+#
+# Sprite Stubs
+#
+
+#
+# GetSpriteInfo
+#
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 41 54 41 55 41 56 41 57 48 83 EC ?? 4C 8B BC 24
+
+      patch: |
+        ret
+
+#
+# BuildSpriteLoadName
+#
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 48 89 7C 24 ?? 41 56 48 81 EC ?? ?? ?? ?? 4D 8B F1 48 8B F2
+
+      patch: |
+        ret
+
+#
+# InitMaterialSystem
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 83 EC ?? 48 8B 0D ?? ?? ?? ?? 48 8D 15 ?? ?? ?? ?? 48 8B 01 FF 90 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? 48 8D 15 ?? ?? ?? ?? 48 8B 01 FF 90
+
+      patch: |
+        ret
+
+#
+# CClientState init
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 83 EC ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? FF 15
+
+      patch: |
+        xor rax, rax
+        ret
+
+#
+# CClientState::RunFrame
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 40 53 48 81 EC ?? ?? ?? ?? 83 B9 ?? ?? ?? ?? ?? 48 8B D9 7D
+
+      patch: |
+        mov eax, 0
+        ret
+
+#
+# CEngineClient::InitDefaultConfigs
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: E9 1B BD 02 00
+
+      patch: |
+        ret
+
+
+#
+# MM_Heartbeat
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 83 EC ?? E8 ?? ?? ?? ?? 3B 05
+
+      patch: |
+        ret
+
+#
+# MatchMaking_Frame
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B C4 55 48 8D A8 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 89 78
+
+      patch: |
+        mov eax, 0
+        ret
+
+#
+# Pin_ReportError
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 40 55 53 57 48 8D AC 24 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B F9 48 8B DA
+
+      patch: |
+        ret
+
+#
+# Host_RunFrame_Render
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 40 53 48 83 EC ?? 48 8B 0D ?? ?? ?? ?? 48 85 C9 75 ?? 48 8B 0D
+
+      patch: |
+        ret
+
+
+#
+# _Host_RunFrame
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 83 3D ?? ?? ?? ?? ?? 7C ?? 45 85 ED
+
+      patch: |
+        jmp 1402327F6h
+
+#
+# Host_Init_DuringVideo
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 84 C0 74 ?? 48 8B 0D ?? ?? ?? ?? 48 8D 15 ?? ?? ?? ?? 48 8B 01 FF 90 ?? ?? ?? ?? 45 84 FF
+
+      patch: |
+        jmp 140236F38h
+
+    # RPak array contains 2 elements: 1='common_early', 2='ui'. Changing size to 1 only loads 'common_early'. 'ui' is not needed for dedi.
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: BF ?? ?? ?? ?? 0F 1F 80 ?? ?? ?? ?? 4C 8B 03
+
+      patch: |
+        mov edi, 1
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 80 3D E1 D8 FD 26 00
+
+      patch: |
+        call 140234A00h
+        jmp 140237ABCh
+
+#
+# Host_Init_PostVideo
+#
+
+    
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B 0D ?? ?? ?? ?? 48 85 C9 74 ?? 48 8B 01 4C 8D 05
+
+      patch: |
+        jmp 140238136h
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 75 6C 40 88 35 57 E1 EC 26
+
+      patch: |
+        jmp 1402380D2h
+
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 85 C9 74 06 48 8B 01 FF 50 28 48 8B 05 A9 91 50 01
+
+      patch: |
+        jmp 14023829Eh
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B 05 ?? ?? ?? ?? 44 39 70 ?? 0F 84 ?? ?? ?? ?? 66 0F 6F 05
+
+      patch: |
+        jmp 14023829Eh
+
+
+#
+# Host_ChangeLevel
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B 0D ?? ?? ?? ?? 48 8B 01 FF 90 ?? ?? ?? ?? 80 3D ?? ?? ?? ?? ?? 75 ?? 48 8B CE
+
+      patch: |
+        jmp 140238816h
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B 05 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? 4C 8B C3 48 8B D6
+
+      patch: |
+        jmp 14023892Dh
+
+#
+# Host_NewGame
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: E8 2B 8E 10 00
+
+      patch: |
+        nop
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B 01 FF 90 ?? ?? ?? ?? 80 3D ?? ?? ?? ?? ?? 75 ?? E8
+
+      patch: |
+        jmp 140238DF9h
+
+
+
+
+#
+# Host_Shutdown
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B 0D D8 1A 1D 0D
+
+      patch: |
+        mov edi, dword ptr [16069FA80h]
+        test edi, edi
+        cmovnz ecx, r15d
+        jmp 140239D20h
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 33 C9 E8 ?? ?? ?? ?? 41 8B DF
+
+      patch: |
+        mov ebx, r12d
+        jmp 14023A22Eh
+
+
+#
+# Host_Disconnect
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B 05 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? FF 90 ?? ?? ?? ?? 33 D2 C7 44 24
+
+      patch: |
+        jmp 14023CD5Eh
+
+#
+# CModelLoader::Studio_LoadModel
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: FF 90 ?? ?? ?? ?? 48 8B F0 48 85 C0 0F 84 ?? ?? ?? ?? 48 8B 10 48 8B C8 FF 92 ?? ?? ?? ?? 84 C0 74
+
+      patch: |
+        mov rsi, rax
+        test rax, rax
+        jz 1402532C9h
+        mov rdx, [rax]
+        mov rcx, rax
+        test al, al
+        jz label_1
+        or dword ptr [rbx+114h], 4
+        label_1:
+        mov rdi, [rsi]
+        mov edx, 5554h
+        mov rcx, rsi
+        xor ecx, ecx
+        test eax, eax
+        setnz cl
+        inc ecx
+        or [rbx+114h], ecx
+        mov rcx, rsi
+        mov rax, [rsi]
+        test al, al
+        jz label_2
+        or dword ptr [rbx+114h], 8
+        label_2:
+        mov rax, [rsi]
+        xor edx, edx
+        mov rcx, rsi
+        test al, al
+        jz label_3
+        or dword ptr [rbx+114h], 10h
+        label_3:
+        mov rax, [rsi]
+        mov rcx, rsi
+        jmp 1402532BAh
+
+#
+# CModelLoader::UnloadModel
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B 88 ?? ?? ?? ?? 48 8B 01 FF 50 ?? 48 8B 83
+
+      patch: |
+        mov rax, [rbx+140h]
+        mov rcx, qword ptr [14D40B378h]
+        mov qword ptr [rax+178h], rbp
+        mov rax, [rcx]
+        call qword ptr [rax+3E0h]
+        lea rsi, [rdi+100h]
+        test rsi, rsi
+        jz 1402565F1h
+        mov rcx, rsi
+        call 14027B910h
+        jmp 1402565F1h
+        
+#
+# CClientState::Disconnect
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 40 56 57 41 54 41 55 41 57
+
+      patch: |
+        mov eax, 0
+        ret
+
+#
+# Load video config
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 40 55 53 41 56 48 8D AC 24 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B 05
+
+      patch: |
+        mov eax, 1
+        ret
+
+#
+# KeyboardLayout_Init
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 83 EC ?? 33 C9 FF 15 ?? ?? ?? ?? 48 8D 0D
+
+      patch: |
+        ret
+
+#
+# SCR_BeginLoadingPlaque
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 83 EC ?? 0F 29 74 24 ?? 48 89 5C 24
+
+      patch: |
+        ret
+
+#
+# ResetPreviousGameState
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 5C 24 10 48 89 74 24 18 48 89 7C 24 20 55 41 54 41 55 41 56 41 57 48 8D AC 24 60 FB FF FF 48 81 EC A0 05 00 00 48 8B 05 02 C4 CD 01
+
+      patch: |
+        ret
+
+#
+# UpdateMaterialSystemConfig
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 5C 24 ?? 57 48 83 EC ?? 80 3D ?? ?? ?? ?? ?? 0F 84
+
+      patch: |
+        mov eax, 0
+        ret
+
+#
+# HandleConfigFile
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 40 56 48 81 EC ?? ?? ?? ?? 8B F1
+
+      patch: |
+        mov eax, 1
+        ret
+
+#
+# LoadPlayerConfig
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 89 4C 24 ?? 48 81 EC ?? ?? ?? ?? 48 83 3D
+
+      patch: |
+        ret
+
+
+#
+# VCR_EnterPausedState
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 40 53 48 83 EC ?? 65 48 8B 04 25 ?? ?? ?? ?? BB ?? ?? ?? ?? C6 05
+
+      patch: |
+        ret
+
+#
+# CVideoMode_Common::CreateWindowClass
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 40 55 53 57 48 8D AC 24 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B F9 FF 15
+
+      patch: |
+        mov eax, 1
+        ret
+
+#
+# CVideoMode_Common::CreateGameWindow
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B CE 48 89 5C 24 ?? E8 ?? ?? ?? ?? E8
+
+      patch: |
+        jmp 1402991CBh
+
+#
+# CSourceAppSystemGroup::Create
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8D 05 ?? ?? ?? ?? 48 89 05 ?? ?? ?? ?? 48 89 05 ?? ?? ?? ?? 48 8D 05 ?? ?? ?? ?? 48 89 05 ?? ?? ?? ?? 48 89 05
+
+      patch: |
+        mov qword ptr [14D40B2E0h], rax
+        lea rax, [14187A8A0h]
+        mov qword ptr [14D40B310h], rax
+        mov qword ptr [14D40B388h], rax
+        lea rax, [14172FDA0h]
+        mov qword ptr [14D40B368h], rax
+        lea rax, [14172E090h]
+        mov qword ptr [14D40B328h], rax
+        lea rax, [141738C08h]
+        mov qword ptr [14D40B338h], rax
+        lea rax, [141F10730h]
+        mov qword ptr [14D40B318h], rax
+        lea rax, [141F0AD10h]
+        mov qword ptr [14D40B370h], rax
+        lea rax, [141874C40h]
+        mov qword ptr [14D40B2D8h], rax
+        mov qword ptr [14D40B378h], rsi
+        jmp 14044B12Bh
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B 0D 9D 01 FC 0C
+
+      patch: |
+        mov rcx, qword ptr [14D40B378h]
+        xor edx, edx
+        mov rax, [rcx]
+        jmp 14044B20Ah
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B 0D F0 00 FC 0C
+
+      patch: |
+        mov rcx, qword ptr [14D40B2D8h]
+        xor edx, edx
+        mov rax, [rcx]
+        jmp 14044B286h
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B 0D A4 00 FC 0C
+
+      patch: |
+        mov rcx, qword ptr [14D40B378h]
+        mov rax, [rcx]
+        call qword ptr [rax+20h]
+        mov rcx, qword ptr [14D40B328h]
+        mov rax, [rcx]
+        call qword ptr [rax+20h]
+        mov rcx, qword ptr [14D40B2D8h]
+        mov rax, [rcx]
+        jmp 14044B34Eh
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B 0D DA FF FB 0C 48 8B 01 FF 50 20 48 8B 0D 2D 00 FC 0C
+
+      patch: |
+        jmp 14044B39Eh
+
+
+
+
+
+
+#
+# CL_ClearState
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 5C 24 ?? 48 89 74 24 ?? 57 48 81 EC ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? 48 8B 01
+
+      patch: |
+        ret
+
+
+#
+# Rui_LoadAsset
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 40 57 48 83 EC 20 E8 05 DF E7 FF
+
+      patch: |
+        mov eax, 0
+        ret
+
+
+#
+# sub_140255FC0
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 74 24 10 57 48 83 EC 20 8B 82 08 01 00 00
+
+      patch: |
+        xor rax, rax
+        ret
+
+
+#
+# CHLClient::LevelShutdown
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC ?? 48 8B F9 48 8D 0D
+
+      patch: |
+        mov eax, 0
+        ret
+
+#
+# CMaterialSystem::Init
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 05 ?? ?? ?? ?? 4C 8D 25 ?? ?? ?? ?? 41 8B F5
+
+      patch: |
+        jmp 1403BC930h
+
+
+#
+# CModelLoader::Map_LoadModelGuts
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B 0D ?? ?? ?? ?? 4C 8B EA 48 8B 01
+
+      patch: |
+        mov r13, rdx
+        jmp 140254B85h
+
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 74 ?? 48 8B 05 ?? ?? ?? ?? 48 85 C0 75 ?? E8 ?? ?? ?? ?? 48 89 05 ?? ?? ?? ?? 4C 8B 00 48 8B D3 48 8B C8 41 FF 50 ?? BA ?? ?? ?? ?? 48 8D 4C 24 ?? E8 ?? ?? ?? ?? 48 63 5C 24
+
+      patch: |
+        jmp 140254FF2h
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: E8 ?? ?? ?? ?? 41 83 8D
+
+      patch: |
+        or dword ptr [r13+108h], 4
+        mov edx, 0Eh
+        lea rcx, [rbp+70h]
+        call 14024C4A0h
+        mov rsi, qword ptr [rbp+210h]
+        lea rcx, [rbp+70h]
+        mov rdx, rsi
+        mov edx, 4Fh
+        lea rcx, [rsp+30h]
+        call 14024C4A0h
+        movsxd rbx, [rsp+30h]
+        test bl, 1
+        jz label_a
+        lea rdx, [1666ED300h]
+        lea rcx, [141332070h]
+        call 14022FAB0h
+        label_a:
+        cmp byte ptr [rsp+5Dh], 0
+        mov r14, qword ptr [14B37CA50h]
+        mov rdi, [rsp+48h]
+        jmp 1402551FDh
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 75 ?? 45 33 F6 4C 89 B7
+
+      patch: |
+        nop
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 0F 8E ?? ?? ?? ?? 49 8B DE 0F 1F 40
+
+      patch: |
+        jmp 14025571Dh
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 0F 8E ?? ?? ?? ?? 49 8B DE 0F 1F 40
+
+      patch: |
+        jmp 14025571Dh
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: E8 ?? ?? ?? ?? 48 8B 9D ?? ?? ?? ?? 48 85 DB 74 ?? 48 8B 05
+
+      patch: |
+        nop
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 74 ?? 48 8B 7C 24 ?? E9
+
+      patch: |
+        nop
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 75 ? 4C 89 B7
+
+      patch: |
+        nop
+
+#
+# Host_Init
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 0F 85 ?? ?? ?? ?? 0F B6 05 ?? ?? ?? ?? 48 8D 0D
+
+      patch: |
+        jmp 140236E01h
+
+#
+# CWin32Surface::initStaticData
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 83 EC 28 E8 37 77 46 00
+
+      patch: |
+        ret
+
+#
+# CModelRenderSystem::CModelRenderSystem
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 83 EC ?? 80 3D ?? ?? ?? ?? ?? 74 ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? EB ?? 48 8B 05 ?? ?? ?? ?? 48 89 05 ?? ?? ?? ?? 48 8D 05 ?? ?? ?? ?? 48 89 05 ?? ?? ?? ?? 48 8D 05 ?? ?? ?? ?? 48 89 05
+
+      patch: |
+        jmp 14117FCD8h
+
+
+#
+# Pak_UpdateModelAsset
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B 0D ?? ?? ?? ?? 48 8B 01 FF 90 ?? ?? ?? ?? 48 8B 8C 24
+
+      patch: |
+        jmp 1401E4546h
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B 0D ?? ?? ?? ?? 49 8D 57 ?? 48 8B 01 FF 50 ?? 4D 85 F6
+
+      patch: |
+        test r14, r14
+        jz 1401E48ACh
+        jmp 1401E466Ah
+
+
+#
+# CEngineVGui::Shutdown
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC ?? 80 3D ?? ?? ?? ?? ?? 48 8B D9
+
+      patch: |
+        mov eax, 0
+        ret
+
+#
+# CEngineVGui::HideGameUI
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 40 53 48 83 EC ?? F6 81 ?? ?? ?? ?? ?? 48 8B D9 74 ?? 32 C0
+
+      patch: |
+        xor rax, rax
+        ret
+
+#
+# CEngineVGui::UpdateProgressBar
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 5C 24 ?? 57 48 83 EC ?? 8B DA 48 8B F9 FF 15 ?? ?? ?? ?? 3B 05
+
+      patch: |
+        xor rax, rax
+        ret
+
+#
+# CVGui::RunFrame
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 40 57 48 83 EC ?? 48 89 5C 24 ?? 48 8B F9 48 89 6C 24 ?? 0F B6 69
+
+      patch: |
+        mov eax, 0
+        ret
+
+#
+# CHLClient::SetSoundState
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 83 EC ?? 0F B6 0D ?? ?? ?? ?? 88 15
+
+      patch: |
+        ret
+
+#
+# CalcPropStaticFrustrumCull
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 49 8B 5C CD ?? 48 8B CB
+
+      patch: |
+        mov rcx, rbx
+        mov rax, [rbx]
+        jmp 14028F9A1h
+
+#
+# Sys_InitGame
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 0F 95 05 ?? ?? ?? ?? 33 D2
+
+      patch: |
+        nop
+
+#
+# CEngine::Frame
+# Dont limit to 30fps minimum
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 83 78 ?? ?? 75 ?? 80 3D ?? ?? ?? ?? ?? 75 ?? 48 8B 0D
+
+      patch: |
+        jmp 1402971B7h
+
+#
+# sub_140297B30
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B 01 48 89 74 24 ?? 48 89 7C 24 ?? 48 8B BC 24
+
+      patch: |
+        jmp 140297B95h
+
+#
+# CClient::ActivatePlayer
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 0F 87 ?? ?? ?? ?? 83 3D ?? ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? 48 89 7C 24
+
+      patch: |
+        jnz 140303C33h
+
+#
+# CServer::SpawnServer
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: E8 F8 B6 FA FF
+
+      patch: |
+        jmp 140312DCDh
+
+#
+# Fix in client maybe?
+#
+
+#
+# EbisuSDK_RunFrame
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 0F 84 ?? ?? ?? ?? 80 3D ?? ?? ?? ?? ?? 74 ?? 48 8B 0D
+
+      patch: |
+        jnz 14033066Eh
+
+#
+# Mod_PrecacheLevelAssets
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 0D ?? ?? ?? ?? 48 89 05 ?? ?? ?? ?? 0F 94 C2
+
+      patch: |
+        nop
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 0D ?? ?? ?? ?? 48 89 05 ?? ?? ?? ?? EB
+
+      patch: |
+        nop
+
+#
+# CBaseFileSystem::AddMapPackFile
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 0D ?? ?? ?? ?? 48 89 05 ?? ?? ?? ?? EB
+
+      patch: |
+        nop
+
+#
+# CInputSystem::PollInputState
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 40 57 41 54 41 55 48 83 EC
+
+      patch: |
+        mov eax, 0
+        ret
+
+#
+# CShaderSystem::Init
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC ?? C6 41 ?? ?? 48 8D 1D
+
+      patch: |
+        ret
+
+#
+# LoadModelInternal
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 48 8B 0C C8 48 8B 01 FF 90 ?? ?? ?? ?? 85 C0
+
+      patch: |
+        jmp 14045564Ah
+
+#
+# CStudioRenderContext::LoadMaterials
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 0F 85 ?? ?? ?? ?? 41 81 21
+
+      patch: |
+        jmp 140456FFDh
+
+# Exploitable defects
+
+# This fixes a stack smash in 'CNetChan::ProcessSubChannelData' caused by the last fragment
+# of a split packet, which could exceed the stack allocated buffer size of 560 bytes.
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 44 8D 04 ED ?? ?? ?? ?? 48 8B CB 48 8D 54 24
+
+      # Check if fragment size of 'last' split packet doesn't exceed stack buffer size.
+      # Jump to gadget (xor al, al; pop..; ret;).
+      patch: |
+        cmp rbp, 230h
+        jg 140261CE6h
+
+# This fixes a vulnerability in which the index field in the NET_SetConVar message
+# could be used to read outside the static userinfo cvar string array.
+# The oversize check was missing causing OOB reads! String array size is 0x27,
+# so only index into it if its within bounds..
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 75 ?? 41 B8 ?? ?? ?? ?? 48 89 7C 24 ?? 48 8B CB
+
+      patch: |
+        jz read_name
+        cmp eax, 28h
+        jb 14030E951h
+        read_name:
+        mov r8d, 104h
+
+# This fixes a vulnerability in which the SQClass' '_members' buffer could overrun due to a missing check for current member count in the class.
+# This has been patched on the Squirrel repo in commit: https://github.com/albertodemichelis/squirrel/commit/23a0620658714b996d20da3d4dd1a0dcf9b0bd98
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+      jump_back: false
+      byte_restore_pos: trailing
+
+      sig: 8B 0E 48 8B 7D
+
+      patch: |
+        mov rcx, qword ptr [rbx+40h]
+        mov eax, dword ptr [rcx+54h]
+        cmp eax, 0FFFFFFh
+        jge exit
+        mov ecx, [rsi]
+        mov rdi, [rbp-38h]
+        jmp 14106819Bh
+        exit:
+        xor bl, bl
+        jmp 141068429h
+
+#
+# NET_ReceiveDatagram
+# Fix incorrect return condition, oversized packets should not cause a return but should instead continue listening for more packets
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 0F 8D ?? ?? ?? ?? 48 8B 47 ?? 83 38
+
+      patch: |
+        jge 140265650h
+
+#
+# NET_ReceiveDatagram
+# Fix incorrect return condition, we should keep listening if we get malformed LZSS data
+#
+
+    - type: code
+      segment: .text
+      mode: replace
+
+      sig: 0F 84 ?? ?? ?? ?? 81 3B
+
+      patch: |
+        jz 140265650h
+        cmp dword ptr [rbx], 53535A4Ch
+        jnz 140265650h
+        movsxd rsi, dword ptr [rbx+4]
+        lea eax, [rsi-1]
+        cmp eax, 3FFFFh
+        ja 140265650h
+
+#
+# MTX_ReadUserMsg_OpenedPack
+# Clamp size to stack size
+#
+
+#Borked auto return, debug this
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: false
+      jump_back: false
+      byte_restore_pos: trailing
+
+      sig: 45 84 F6 74 ?? 48 8D 5D
+
+      patch: |
+        cmp r14b, 10h
+        jnb 1402A8338h
+        test r14b, r14b
+        jz 1402A7F33h
+        jmp 1402A7F00h
+
+#
+# CClient::ProcessVoiceData
+# This patch fixes a stack buffer overflow due to the net message length field being passed straight to bf_read::ReadBits
+#
+
+    - type: code
+      segment: .text
+      mode: insert
+
+      keep_stolen: true
+      jump_back: true
+      byte_restore_pos: trailing
+
+      sig: 44 8B 42 ?? 48 8B F9 48 8D 4A ?? 48 8B DA 48 8D 54 24
+
+      patch: |
+        mov r8d, [rdx+20h]
+        cmp r8d, 1000h
+        jg 1403069B1h
