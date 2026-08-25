@@ -139,12 +139,13 @@ jobs:
         run: |
           chmod +x BinPatch
           ./BinPatch -input r5apex.unpacked.exe -patch r5apex.yaml -output out/r5apex.exe
+          ./BinPatch -input r5apex.unpacked.exe -patch r5apex_ds.yaml -output out/r5apex_ds.exe
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
         with:
           name: r5apex
-          path: out/r5apex.exe
+          path: out/r5apex*.exe
           if-no-files-found: error
           retention-days: 7
 
@@ -159,7 +160,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v8
         with:
-          pattern: r5apex
+          pattern: r5apex*
           merge-multiple: true
           path: rel
 
