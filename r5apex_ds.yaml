@@ -1567,7 +1567,7 @@ patches:
       patch: |
         jnz back
         lea rcx, [160676D40h]
-        call 1412969B0h
+        call [1412969B0h]
         jmp 140207AC7h
         back:
         mov dword ptr [rax+4], 0FFFFFFFFh

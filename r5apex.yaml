@@ -49,6 +49,15 @@ patches:
       offset: 0x8B0C
       bytes: [0x80, 0x3E, 0x00, 0x00, 0x00, 0x7D, 0x00, 0x00] 
 
+    #
+    # Increase hardcoded frame rate limit to 10000.0
+    #
+
+    - type: data
+      section: .rdata
+      offset: 0x325D88
+      bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x88, 0xC3, 0x40]
+
     - type: data
       section: .rdata
       offset: 0x9CA26
@@ -97,7 +106,7 @@ patches:
     - type: data
       section: .rdata
       offset: 0x479A8
-      string: "Negative response in cache while server connect"
+      string: "Negative response in cache while server connect\n"
 
     - type: data
       section: .rdata
@@ -1839,8 +1848,8 @@ patches:
       sig: C7 05 ?? ?? ?? ?? ?? ?? ?? ?? C7 05 ?? ?? ?? ?? ?? ?? ?? ?? 48 83 C4 ?? C3 CC CC CC 48 89 5C 24
 
       patch: |
-        mov dword ptr [1671CAA84h], 3h
-        mov dword ptr [1671CAA88h], 3h
+        mov dword ptr [1635A7A30h], 3h
+        mov dword ptr [1635A7A34h], 3h
 
 # Jump to code cave to set the 3rd (new) element, because there was not enough space left in
 # the current function frame.
@@ -1859,7 +1868,7 @@ patches:
       sig: 48 83 C4 ?? C3 CC CC CC 48 89 5C 24 ?? 48 89 74 24 ?? 48 89 7C 24 ?? 55 41 54
 
       patch: |
-        mov dword ptr [1671CAA8Ch], 3h
+        mov dword ptr [1635A7A38h], 3h
 
 
 # Since we increased dword_1671CAA48 and qword_1671CAA10 from 6 elements to 9 elements,
@@ -2193,7 +2202,7 @@ patches:
       patch: |
         jnz back
         lea rcx, [160676D40h]
-        call 1412969B0h
+        call [1412969B0h]
         jmp 140207AC7h
         back:
         mov dword ptr [rax+4], 0FFFFFFFFh
@@ -3321,17 +3330,17 @@ patches:
         mov qword ptr [rsp+0AC98h], r14
         mov r8, rbx
         imul r14, rcx, 3E80h
-        lea r14, [r14+rdx]
+        lea rcx, [r14+rdx]
         mov rdx, rbp
         add rcx, r15
         call 14119E100h
         add [r15+rsi*4], ebx
         mov rcx, [rdi+r12+0FA18h]
-        call 1412971F0h
+        call [1412971F0h]
         cmp eax, 3
         jnb 1409B0262h
         mov rcx, [rdi+r12+0FA18h]
-        call 1412971F0h
+        call [1412971F0h]
         cmp eax, 4
         jnb 1409B0262h
         mov eax, [rdi+r12+0FA10h]
