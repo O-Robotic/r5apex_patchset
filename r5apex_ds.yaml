@@ -40,6 +40,9 @@ imports:
       module: bink2w64.dll
       remove: true
 
+symbols:
+    JT_WakeThreadsByMask: 0x14045A160
+
 exports:
     clear: true
     entries:
@@ -1125,6 +1128,37 @@ patches:
       section: .rdata
       offset: 0xB7870
       string: "vpk/server_mp_"
+
+
+    #
+    # Deinline thread waking within render thread dispatcher
+    # This is needed because the thread wakeup system was switched from a conditional variable to a WakeByAddress based system
+    #
+
+    - type: code
+      segment: .text
+      mode: replace
+      sig: BF ?? ?? ?? ?? 0F 1F 44 00 ?? 48 0F BC CF
+
+      patch: |
+        mov rcx, 1
+        call JT_WakeThreadsByMask
+        jmp 1403DF548h
+
+    #
+    # Deinline JT_WakeThreadByMask in JT_WakeWorkersForJob
+    #
+
+    - type: code
+      segment: .text
+      mode: replace
+      sig: 48 0F BC CF 74 ?? 8B D9
+
+      patch: |
+        mov rcx, rdi
+        call JT_WakeThreadsByMask
+        jmp 14045A88Ah
+
 
     # This patch assigns the model and anim cache pointers to NULL instead of 0xDEADFEEDDEADFEED,
     # if the asset failed to load. The 0xDEADFEEDDEADFEED (DC_INVALID_HANDLE) assignment was most
@@ -4204,3 +4238,4 @@ patches:
         mov r8d, [rdx+20h]
         cmp r8d, 1000h
         jg 1403069B1h
+

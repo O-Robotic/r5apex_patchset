@@ -39,6 +39,9 @@ exports:
         name: g_pCmdLine
         rva: 0x1F07600
 
+symbols:
+    JT_WakeThreadsByMask: 0x14045A160
+    
 patches:
 
     #
@@ -1065,6 +1068,37 @@ patches:
       section: .rdata
       offset: 0x173D1C
       string: "View"
+
+
+    #
+    # Deinline thread waking within render thread dispatcher
+    # This is needed because the thread wakeup system was switched from a conditional variable to a WakeByAddress based system
+    #
+
+    - type: code
+      segment: .text
+      mode: replace
+      sig: BF ?? ?? ?? ?? 0F 1F 44 00 ?? 48 0F BC CF
+
+      patch: |
+        mov rcx, 1
+        call JT_WakeThreadsByMask
+        jmp 1403DF548h
+
+    #
+    # Deinline JT_WakeThreadByMask in JT_WakeWorkersForJob
+    #
+
+    - type: code
+      segment: .text
+      mode: replace
+      sig: 48 0F BC CF 74 ?? 8B D9
+
+      patch: |
+        mov rcx, rdi
+        call JT_WakeThreadsByMask
+        jmp 14045A88Ah
+
 
     # This patch adds support for loading the 'LUMP_PAKFILE' lump as a discrete file.
     # The function originally loaded the BSP, and stored the header in a local variable.
